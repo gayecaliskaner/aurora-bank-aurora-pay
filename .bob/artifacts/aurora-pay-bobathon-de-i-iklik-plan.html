@@ -1,0 +1,166 @@
+
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<title>Aurora Pay Bobathon: Değişiklik Planı</title>
+<style>
+  body{margin:0;background:#fff;color:#1f2328;font-family:-apple-system,"Segoe UI",system-ui,sans-serif;font-size:14.5px;line-height:1.6}
+  main{max-width:760px;margin:0 auto;padding:40px 20px 24px}
+  h1{font-size:26px;line-height:1.25;margin:0 0 6px}
+  h2{font-size:18px;margin:38px 0 10px;padding-top:14px;border-top:1px solid #e5e7eb}
+  h3{font-size:15px;margin:22px 0 6px}
+  p{margin:0 0 10px}
+  .muted{color:#57606a}
+  .lead{color:#57606a;margin-bottom:18px}
+  .box{background:#f7f8fa;border:1px solid #e5e7eb;padding:10px 14px;margin:12px 0}
+  .box b{display:block;margin-bottom:2px}
+  table{border-collapse:collapse;width:100%;margin:8px 0 14px;font-size:13px}
+  th,td{text-align:left;vertical-align:top;padding:7px 10px 7px 0;border-bottom:1px solid #e5e7eb}
+  th{font-weight:600;border-top:1px solid #e5e7eb;color:#57606a}
+  td.id{white-space:nowrap;font-weight:600;width:34px}
+  td.src{white-space:nowrap;color:#57606a;width:70px}
+  td.pri{white-space:nowrap;width:28px;font-weight:600}
+  .p1{color:#3b82d4}
+  code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;background:#f7f8fa;padding:0 3px}
+  ul,ol{margin:0 0 10px;padding-left:20px}
+  li{margin-bottom:4px}
+  .kv td{border-bottom:1px solid #e5e7eb}
+  footer{max-width:760px;margin:30px auto 0;padding:12px 20px 30px;border-top:1px solid #e5e7eb;text-align:center;color:#57606a;font-size:12px}
+</style>
+</head>
+<body>
+<main>
+
+<h1>Aurora Pay Bobathon: Değişiklik Planı</h1>
+<p class="lead">Üç geri dönüş dosyası okundu ve repo ile karşılaştırıldı. Bu belge yalnızca plandır: <strong>repoda hiçbir dosya değiştirilmedi.</strong> Uygulama, aşağıdaki "Karar bekleyen noktalar" yanıtlandıktan sonra başlar.</p>
+
+<h2>1. Okunan kaynaklar</h2>
+<table>
+  <thead><tr><th>Kısaltma</th><th>Kaynak</th><th>Ana içerik</th></tr></thead>
+  <tbody>
+    <tr><td class="id">BS</td><td>Barış Sözen, dry-run notları (13 Kasım)</td><td>M0-M8 baştan sona çalıştırıldı, 117 kontrol geçti, ≈2 sa 25 dk. Sorunlar içerikten değil ortamdan: eski Python, Bob Shell, <code>BOB_API_KEY</code>, GitHub oturumu. 16 maddelik aksiyon tablosu, 4 saatlik program, ön hazırlık listesi.</td></tr>
+    <tr><td class="id">TR</td><td>Test raporu (18 Kasım, Python 3.14, Bob Shell 2.0.6, IDE 2.3.0)</td><td>Temiz klonda Shell ve IDE turu. Doğrulayıcı ve görev kartı düzeltmeleri <code>fix/dryrun-bulgulari</code> dalında denendi. M4 ve M7 doğrulayıcılarında tasarım sorunları bulundu.</td></tr>
+    <tr><td class="id">KF</td><td>Kürşat, geri bildirim</td><td>Hikâye iyi, ama metinlerin Türkçesi doğal değil. Kurulum sırası kafa karıştırıyor, <code>setup.sh</code> her şeyi kurmuyor, <code>aurora-pay-core</code> servisi hiç tanıtılmıyor. M1 testi ile spec arasında çelişki var.</td></tr>
+  </tbody>
+</table>
+
+<div class="box"><b>En önemli tespit: repo hâlâ düzeltme öncesi hâlinde</b>
+Test raporundaki düzeltmeler (<code>fix/dryrun-bulgulari</code>) bu repoya girmemiş. Kodda doğruladım: <code>setup.sh</code> ve <code>verify/test_m0_setup.py</code> hâlâ Python 3.10 kabul ediyor, M0 semgrep kontrolü <code>.venv-tools</code> içine bakmıyor, kılavuzda "Boss", "Hamle", "Güç-up", "Joker" terimleri duruyor, <code>.gitignore</code> içinde <code>PWNED*</code> ve <code>.vscode/</code> yok. Yani plan, üç kaynağın bulgularını bu repoya <em>baştan</em> uygulamayı kapsıyor.</div>
+
+<p><strong>Öncelik:</strong> <span class="p1">P1</span> katılımcıyı bloklar ya da yanlış sonuç verir. P2 akışı yavaşlatır ya da karıştırır. P3 iyileştirmedir.</p>
+
+<h2>2. Planlanan değişiklikler</h2>
+
+<h3>A. Kurulum ve ortam</h3>
+<table>
+  <thead><tr><th>#</th><th>Değişiklik</th><th>Kaynak</th><th>Ö</th></tr></thead>
+  <tbody>
+    <tr><td class="id">A1</td><td><code>setup.sh</code>: gereksinim Python 3.11+ olur. Hata mesajına <code>PYTHON=/yol/python ./setup.sh --scanners</code> örneği eklenir. Betiğin başına ön kontrol konur (Python sürümü, <code>venv</code> modülü, pip, git, <code>bob</code>). Eksik olanı ve nasıl kurulacağını söyler. Sonda ne kurulduğu özetlenir.</td><td class="src">BS-4, KF, TR</td><td class="pri p1">P1</td></tr>
+    <tr><td class="id">A2</td><td><code>verify/test_m0_setup.py</code>: Python 3.11+ kontrolü. Semgrep sırayla <code>.venv-tools/bin</code>, <code>.venv/bin</code>, PATH içinde aranır ve <code>semgrep --version</code> çalıştırılır. Böylece kurulumdan sonra <code>source .../activate</code> gerekmez (şu an <code>shutil.which</code> yüzünden M0 6/7'de kalıyor). <code>bob</code> mesajı "facilitator'dan iste" yerine kurulum adımını gösterir.</td><td class="src">BS-4, BS-5, KF, TR</td><td class="pri p1">P1</td></tr>
+    <tr><td class="id">A3</td><td>Linux'ta <code>python3-venv</code> / <code>pip</code> yoksa <code>setup.sh</code> anlaşılır bir mesaj versin. Root gerektirmeyen yol (ör. <code>uv</code> ile venv) araştırılır. Sonuç ön hazırlıkta "hangi yetki gerekir" olarak yazılır.</td><td class="src">KF</td><td class="pri p1">P1</td></tr>
+    <tr><td class="id">A4</td><td>Eksik modül sorunu: temiz bir Linux ortamında (root'suz) <code>./setup.sh --scanners</code>, <code>uvicorn services.core.main:app</code> ve <code>repro.py</code> sırayla çalıştırılır. Çıkan eksikler <code>requirements*.txt</code> ya da <code>setup.sh</code> içine alınır. Hangi modüllerin eksik olduğu geri bildirimde yazmıyor, önce yeniden üretilmeli.</td><td class="src">KF</td><td class="pri p1">P1</td></tr>
+    <tr><td class="id">A5</td><td>Etkinleştirmeden çalışan komutlar: kılavuz ve görev kartlarında <code>python fixtures/incident/repro.py</code> yerine <code>.venv/bin/python ...</code> yazılır. <code>verify/run.sh</code> ve <code>scripts/scan.sh</code> zaten <code>.venv</code> yoluna düşüyor, onlara dokunulmaz.</td><td class="src">BS-10, KF</td><td class="pri">P2</td></tr>
+    <tr><td class="id">A6</td><td><code>.gitignore</code>: <code>PWNED*</code>, <code>.vscode/</code>, <code>reports/bob-run.json</code> eklenir (M8 "temiz çalışma dizini" kontrolü bunlar yüzünden bozulabiliyor).</td><td class="src">TR</td><td class="pri">P2</td></tr>
+  </tbody>
+</table>
+
+<h3>B. Doğrulayıcılar (<code>verify/</code>)</h3>
+<table>
+  <thead><tr><th>#</th><th>Değişiklik</th><th>Kaynak</th><th>Ö</th></tr></thead>
+  <tbody>
+    <tr><td class="id">B1</td><td><code>verify/test_m5_findings.py</code>: enjeksiyon denemeleri geçici dizinde çalışır ve artık bırakmaz. Şu an <code>services/core/reports.py</code> göreli yolla <code>tar</code> çalıştırdığı için repoda <code>PWNED.tgz</code> ve <code>archives/a</code> kalabiliyor. Düzelince kılavuzdaki elle <code>rm -f PWNED.tgz archives/a</code> adımı kalkar.</td><td class="src">TR</td><td class="pri p1">P1</td></tr>
+    <tr><td class="id">B2</td><td><code>verify/test_m7_bobcoin.py</code>: şu an elle yazılmış JSON da geçiyor (yalnızca "geçerli JSON, ≥50 karakter" bakıyor). Bob'un ürettiği sonuç kaydını ve sayısal Bobcoin harcamasını (<code>stats</code>) arayacak. Gerçek bir <code>bob run --format json</code> çıktı örneği gerekiyor, alan adlarını tahmin etmeyeceğim.</td><td class="src">TR</td><td class="pri">P2</td></tr>
+    <tr><td class="id">B3</td><td><code>verify/test_m8_delivery.py</code>: dal adı hata mesajı, M0'da açılması gereken <code>feature/&lt;kısa-ad&gt;</code> dalını hatırlatır. Kontrolün kendisi değişmez.</td><td class="src">BS-14</td><td class="pri">P3</td></tr>
+    <tr><td class="id">B4</td><td>M1 spec/test çelişkisi: Kürşat'ın gösterdiği <code>test_put_limits_bad_money_format_returns_422</code> bu repoda <strong>yok</strong> (aradım). Repodaki <code>verify/test_m1_limits.py</code> satır 55-59 zaten <code>"5000"</code> değerini 200 ile kabul ediyor. Yani çelişki büyük olasılıkla katılımcı tarafında Bob'un yazdığı testte. Yapılacak: <code>docs/API-SPEC-limits.yaml</code> ve <code>PRD-limits.md</code> bölüm 5'te "ondalık kısım zorunlu değil, en fazla 2 ondalık; yanıt her zaman 2 ondalıklı" cümlesini netleştirmek ve <code>"1000"</code> için açık bir 200 test durumu eklemek.</td><td class="src">KF</td><td class="pri">P2</td></tr>
+    <tr><td class="id">B5</td><td>Plan modunun soracağı sorular için PRD'ye "Açık kararlar" bölümü (kapsam hedefi, <code>customer_id</code> doğrulama katmanı, <code>from</code> alias yaklaşımı) eklenir mi? Eklenirse sorular azalır, ama PRD "tek kaynak" olmaktan çıkmaz. Karar bekliyor (K3).</td><td class="src">KF</td><td class="pri">P3</td></tr>
+  </tbody>
+</table>
+
+<h3>C. Katılımcı kılavuzu (<code>KATILIMCI-KILAVUZU.html</code>)</h3>
+<table>
+  <thead><tr><th>#</th><th>Değişiklik</th><th>Kaynak</th><th>Ö</th></tr></thead>
+  <tbody>
+    <tr><td class="id">C1</td><td>Terim değişikliği (tablo aşağıda). Kılavuzda "boss" 37 yerde, "Hamle" 19 satırda geçiyor. Rütbe, XP ve rozet adları nötr ilerleme ifadelerine çevrilir. İlerleme çubuğu kalır (Kürşat ilerleme gösteren HTML istiyor, zaten var).</td><td class="src">BS-1, KF</td><td class="pri p1">P1</td></tr>
+    <tr><td class="id">C2</td><td>Tüm metinlerin Türkçe redaksiyonu. Örnek: "Her görevin sonunda sonucu kendiniz doğrularsınız:" yerine "Her görevin sonunda sonucu doğrulamak için aşağıdaki komutu kullanabilirsiniz:". "Hazır prompt yok" cümleleri kaldırılır (README satır 4, kılavuz hikâye ve "Altın kural" kutusu).</td><td class="src">KF</td><td class="pri p1">P1</td></tr>
+    <tr><td class="id">C3</td><td>M0 sırası: <strong>ön koşul kontrolü, kurulum, doğrulama</strong>. <code>./setup.sh --scanners</code> komutunun ne yaptığı ve neden çalıştırıldığı 1-2 cümleyle yazılır. Klonlama adım adım anlatılır: Clone Git Repository, Clone from GitHub ya da URL. "Boş klasör açma, doğrudan klonla" uyarısı ve klasöre güvenme (Trust) adımı eklenir.</td><td class="src">BS-2, BS-3, KF</td><td class="pri p1">P1</td></tr>
+    <tr><td class="id">C4</td><td>Ön hazırlık listesi: Python 3.11+, git, Bob IDE, Bob Shell (<code>bob --version</code>, Node.js/npm), <code>BOB_API_KEY</code> tanımlama adımı (macOS/Linux ve Windows örnekleri), IDE'de GitHub oturumu, <code>gh auth login</code>, repoda GitHub Actions'ın açık olması. <code>./verify/run.sh m0</code> çıktısının atölyeden önce gönderilmesi. Sorun giderme tablosuna API anahtarı, eski Python, <code>bob</code> yok, Restricted Mode, Actions kapalı satırları eklenir.</td><td class="src">BS-9, TR</td><td class="pri p1">P1</td></tr>
+    <tr><td class="id">C5</td><td>Her görevde "Kontrol: ./verify/run.sh mN" satırı görev başından çıkar, görev sonunda "Doğrulama" adımı olur (kart üst bilgisindeki etiket de kalkar).</td><td class="src">KF</td><td class="pri">P2</td></tr>
+    <tr><td class="id">C6</td><td>M0 ipucu: "kodda sayarak doğrula" yerine "Bob'un verdiği sayıyı <code>wc -l</code> veya <code>grep -c</code> ile doğrula". M0'a <code>/init</code> bonus sorusu. "Uç nokta" her yerde "endpoint" olur.</td><td class="src">BS-6, KF</td><td class="pri">P2</td></tr>
+    <tr><td class="id">C7</td><td>M1: Adım 1'e "ben onaylamadan kod yazma" vurgusu. M1'in <code>aurora-pay-core</code>'dan bağımsız <em>yeni</em> bir servis olduğu açıkça yazılır (PRD bölüm 1 bunu zaten söylüyor, Kürşat "mevcut servisi değiştiriyoruz" diye okumuş). Plan modunun sorabileceği sorulara örnek cevaplar.</td><td class="src">BS-7, KF</td><td class="pri">P2</td></tr>
+    <tr><td class="id">C8</td><td>M2: <code>bob chat</code> ve terminal komutu ayrı bloklara alınır ("iki pencere, iki iş"). <code>BOB_API_KEY</code> hatası eklenir. Görev kapsamı olaydaki dört sorunla sınırlanır (Bob <code>verify/</code> dosyalarını okuyup M4'ün gizli hatalarını da düzeltebiliyor).</td><td class="src">BS-8, BS-9, TR</td><td class="pri p1">P1</td></tr>
+    <tr><td class="id">C9</td><td>M3: <code>/create-mode</code> ipucu ve <code>fileRegex</code> satırını elle kontrol uyarısı. Mod listede görünmezse <em>Developer: Reload Window</em>. M4: M2 sonrası durum için kısa kapsam notu.</td><td class="src">BS-11, TR</td><td class="pri">P2</td></tr>
+    <tr><td class="id">C10</td><td>M5: çalıştırılabilir "İşlev kontrolü" komutu ve beklenen üç çıktı: geçerli arşiv adı <code>{'exit_code': 0}</code>, geçersiz ad 422, enjeksiyon denemesi boş liste. Ek notlar: A5 bağımlılıkları Semgrep dışı, ayrıca kontrol edilir. Findings paneli boş başlayabilir.</td><td class="src">BS-12, TR</td><td class="pri">P2</td></tr>
+    <tr><td class="id">C11</td><td>M6: <code>.bobignore</code> dosyasını Bob yazamıyor, elle oluşturulur. IDE'de <code>@</code> ile dosya sohbete eklenebiliyor, eklenmeden kaldırılmalı.</td><td class="src">TR</td><td class="pri">P2</td></tr>
+    <tr><td class="id">C12</td><td>M7: Bobalytics verisi 60 dakikada bir yenilenir ve saatler UTC'dir. Anlık rakam için <code>bob-run.json</code> içindeki <code>stats</code> kullanılır. <code>--max-cost</code> çalışan turu durdurmayabilir (keşif noktası). Ekran görüntüleri anonimleştirilir.</td><td class="src">BS-13, TR</td><td class="pri">P2</td></tr>
+    <tr><td class="id">C13</td><td>M8 ve M0: M0 sonunda <code>feature/&lt;kısa-ad&gt;</code> dalı açılır, her görevden sonra commit önerilir ("Nasıl çalışır?" bölümü). Plan modunun bıraktığı plan dosyası ve <code>.vscode/</code> için not. GitHub MCP kimlik doğrulaması başarısız olursa <code>gh</code> yolu.</td><td class="src">BS-14, TR</td><td class="pri">P2</td></tr>
+    <tr><td class="id">C14</td><td>Süre: M0 20 dk, görev toplamı 180 dk, 4 saatlik program (iki mola, açılış, kapanış). Kesme sırası güncellenir: M7 portal kısmı, M4, M1, M8 CI beklemesi. M3 ve M6 kesilmez. M7 ikinci moladan sonraya yerleşir.</td><td class="src">BS-15, BS §4-5</td><td class="pri">P2</td></tr>
+  </tbody>
+</table>
+
+<h3>Terim karşılıkları</h3>
+<table>
+  <thead><tr><th>Şimdi</th><th>Olacak</th></tr></thead>
+  <tbody>
+    <tr><td>Boss kontrolü</td><td>Doğrulama</td></tr>
+    <tr><td>Güç-up</td><td>Bob özelliği</td></tr>
+    <tr><td>Joker, Joker kasası</td><td>İpucu (İpucu 1, İpucu 2); son aşama "Eğitmenden yardım"</td></tr>
+    <tr><td>Seviye</td><td>Görev</td></tr>
+    <tr><td>Hamle 1, Hamle 2</td><td>Adım 1, Adım 2</td></tr>
+    <tr><td>Rütbe, XP, rozet</td><td>Nötr ilerleme adları ("x / y teslim edildi", "Görev tamamlandı")</td></tr>
+    <tr><td>Uç nokta</td><td>Endpoint</td></tr>
+  </tbody>
+</table>
+<p class="muted">Not: Test raporu kılavuzdaki "Boss" ifadesini "Bob" yapmış. Bu, Barış'ın "Doğrulama" önerisiyle çelişiyor ("Bob kontrolü" okunmuyor). Plan Barış'ın önerisini esas alır.</p>
+
+<h3>D. Görev kartları ve README</h3>
+<table>
+  <thead><tr><th>#</th><th>Değişiklik</th><th>Kaynak</th><th>Ö</th></tr></thead>
+  <tbody>
+    <tr><td class="id">D1</td><td><code>missions/M0..M8</code>: C bölümündeki içerik değişiklikleri kartlara da yansıtılır (API anahtarı, ayrı terminal, işlev kontrolü, M7 uyarısı, <code>.bobignore</code>, "Hamle" terimi, "Kontrol:" yeri). Kartlar ile kılavuz arasındaki fark BS açık konu 3'te de geçiyor.</td><td class="src">BS §7, TR</td><td class="pri">P2</td></tr>
+    <tr><td class="id">D2</td><td><code>README.md</code>: süre tablosu (M0 20 dk, toplam 180 dk), kesme sırası, kurulum bölümü (Python 3.11+, ön hazırlık bağlantısı, <code>setup.sh</code> açıklaması), "Hazır prompt yok" cümlesi, terimler.</td><td class="src">BS, KF</td><td class="pri">P2</td></tr>
+    <tr><td class="id">D3</td><td><code>docs/</code> dosyalarının (PRD, el kitabı, olay, güvenlik bileti, ücret politikası) ve <code>verify/</code> mesajlarının Türkçe/terim taraması. Not: doğrulayıcı ve <code>setup.sh</code> mesajları bilerek aksansız (ASCII). Windows konsolunda bozulmasın diye aksansız bırakıp yalnızca cümleleri düzeltmeyi öneriyorum (K5).</td><td class="src">KF</td><td class="pri">P3</td></tr>
+  </tbody>
+</table>
+
+<h2>3. Karar bekleyen noktalar</h2>
+<table>
+  <thead><tr><th>#</th><th>Soru</th><th>Önerim</th></tr></thead>
+  <tbody>
+    <tr><td class="id">K1</td><td><strong>Yeni "servisi tanı" görevi.</strong> Kürşat, M1 öncesine <code>aurora-pay-core</code>'u tanıtan ve çalıştıran yeni bir görev istiyor. Yeni görev, M1-M8'i M2-M9 yapar. <code>verify/run.py</code>, doğrulayıcı dosya adları, README ve kılavuz etkilenir; ayrıca ≈25 dk ekler (4 saatlik program 4,5 saate yaklaşır).</td><td>Önce M0'a "servisi ayağa kaldır ve tanı" adımı + tek sayfalık yolculuk eklensin (düşük risk). Ayrı görev, süre kararından sonra.</td></tr>
+    <tr><td class="id">K2</td><td><strong>Basit HTML arayüzü.</strong> <code>services/core</code>'a rota eklemek kapsam (%85), Semgrep ve M4 mutasyon kontrollerini etkiler. FastAPI'nin hazır <code>/docs</code> sayfası sıfır maliyetli bir alternatif.</td><td>Önce <code>/docs</code> kullanılsın. Ayrı bir arayüz gerekirse <code>services/core</code> dışında, bağımsız bir dosya olarak.</td></tr>
+    <tr><td class="id">K3</td><td>PRD'ye "Açık kararlar" bölümü eklensin mi (B5)?</td><td>Hayır. Plan modu sorularını kılavuzda "beklenen sorular ve örnek cevaplar" olarak vermek yeterli, PRD değişmez.</td></tr>
+    <tr><td class="id">K4</td><td><strong>Windows desteği.</strong> <code>setup.sh</code>, <code>verify/run.sh</code>, <code>scripts/scan.sh</code> bash ve <code>.venv/bin/...</code> yolunu varsayıyor (Windows'ta <code>.venv\Scripts</code>). Barış "VM Windows makine yeterli mi?" diye soruyor, Kürşat Windows yetkilerini kurulum dokümanında istiyor.</td><td>Tam Windows betiği yazmadan önce karar gerekir: (a) Git Bash/WSL şart koşulur ve belgelenir, ya da (b) <code>setup.ps1</code> ve PowerShell eşdeğerleri yazılır. Hazır kurulu VM, her iki durumda yedek plan.</td></tr>
+    <tr><td class="id">K5</td><td>Doğrulayıcı ve <code>setup.sh</code> mesajları aksansız ASCII. Aksanlı yapılsın mı?</td><td>Hayır, yalnızca cümleler doğal hâle getirilsin.</td></tr>
+    <tr><td class="id">K6</td><td>Süre: 4 saat mi, 3 saat B planı mı? (BS: 4 saat; TR: 3 saatlik akış provayla ölçülmeli.)</td><td>Programı 4 saat olarak yazalım, B planı (7 görev çekirdek) kılavuza kısa bir not olarak girsin.</td></tr>
+    <tr><td class="id">K7</td><td>Kürşat'ın M1 test hatasının kaynağını doğrulama: hangi dosyada gördü?</td><td>Kürşat'a sorulacak. Cevaba göre B4 daralır ya da genişler.</td></tr>
+  </tbody>
+</table>
+
+<h2>4. Bu repoda yapılmayacaklar</h2>
+<p>Geri dönüşlerde geçen, ama bu repo dışında ya da bu repoyu değiştirmeyen işler. Bunları ayrı takip etmek gerekir.</p>
+<ul>
+  <li><strong>"Paket Apple çipli ve Intel Mac'lerde aynı" cümlesi</strong> bu repoda yok (tüm dosyalarda aradım). Kurulum dokümanı başka yerde; İlayda'ya yönlendirilmeli. Doğru ifade: indirme bağlantısı platforma göre doğru paketi seçer, sayfadaki platform listesinin doğru seçili olduğundan emin olunmalı.</li>
+  <li>Kurum BT ekibine gidecek erişim listesi (<code>bob.ibm.com</code>, <code>github.com</code>, <code>pypi.org</code>, <code>registry.npmjs.org</code> vb.), TLS denetimi, kurulum yetkisi, ayrılmış GitHub organizasyonu.</li>
+  <li>Bobcoin bakiyelerinin ve herkesin Bobathon hesabına geçtiğinin atölye öncesi kontrolü (BS açık konu 1).</li>
+  <li>Hazır ortam (VM / bulut geliştirme ortamı) talebi, oturumdan 30 dk önce teknik kontrol.</li>
+  <li>Eğitmen notları (Bob'un spec'e tam uymayan kod yazması, plan modu soruları, B planı): bu repo katılımcı şablonu olduğu için eğitmen materyali ayrı bir yerde tutulmalı.</li>
+  <li>GitHub Pages: repo özel, yayınlanan site herkese açık olur. Yayın öncesi plan ve içerik uygunluğu doğrulanacak, ekran görüntüleri siteye konmayacak.</li>
+  <li>Görev sürelerinin gerçek katılımcılarla ölçülmesi (Expert Lab denemesi).</li>
+  <li>Bobcoin harcaması (BS-16): aksiyon yok.</li>
+</ul>
+
+<h2>5. Uygulama sırası ve doğrulama</h2>
+<ol>
+  <li><strong>Faz 1, ortam ve doğrulayıcılar (A, B):</strong> <code>setup.sh</code>, <code>test_m0_setup.py</code>, <code>test_m5_findings.py</code>, <code>.gitignore</code>. Kontrol: <code>./verify/run.sh m0</code> 7/7; M5 doğrulayıcısı değişmemiş kodda çalıştırıldıktan sonra <code>git status</code> temiz; <code>pytest</code> yeşil; temiz Linux ortamında kurulum denemesi.</li>
+  <li><strong>Faz 2, dil ve terimler (C1, C2, D3):</strong> tüm kılavuz, kartlar, README, docs. Kontrol: eski terimler için <code>grep</code> (Boss, Hamle, Güç-up, Joker, uç nokta) sıfır sonuç vermeli; HTML ayrıştırma ve bağlantı kontrolü.</li>
+  <li><strong>Faz 3, içerik ve akış (C3-C14, D1, D2):</strong> M0 yeniden sıralama, ön hazırlık, görev notları, program. Kontrol: kılavuz ile kartların içerik uyumu, tüm komutların temiz ortamda çalıştırılması.</li>
+  <li><strong>Faz 4, kararlara bağlı işler:</strong> K1, K2, K4 sonuçlarına göre (servisi tanıma, arayüz, Windows).</li>
+</ol>
+
+<div class="box"><b>Dokunulmayacaklar</b>
+M1-M8 içeriğinin kendisi (Barış tüm görevleri sorunsuz buldu: 117/117 kontrol), kontrol sayıları (35/24/11/12/13/6/3), el kitabı kuralları, <code>services/core</code> kodu. M6 ve M3 kesilmemeli, çünkü atölyenin ayırt edici iki konusunu onlar taşıyor.</div>
+
+</main>
+<footer>Made with IBM Bob</footer>
+</body>
+</html>

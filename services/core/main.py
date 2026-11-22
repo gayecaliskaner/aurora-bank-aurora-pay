@@ -1,11 +1,48 @@
 """Aurora Core: account and transfer API."""
 
-from fastapi import FastAPI, Header, HTTPException
+import logging
 
-from . import reports, service, store
+from fastapi import FastAPI, Header, Request
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
+from starlette.exceptions import HTTPException as StarletteHTTPException
+
+from . import errors, reports, service, store
+from .errors import AppError
 from .models import AccountCreate, ArchiveRequest, TransferRequest
 
+logger = logging.getLogger("aurora.core")
+
 app = FastAPI(title="Aurora Core", version="0.1.0")
+
+
+def _envelope(status_code: int, code: str, message: str) -> JSONResponse:
+    return JSONResponse(status_code=status_code, content={"error": {"code": code, "message": message}})
+
+
+@app.exception_handler(AppError)
+async def _app_error_handler(request: Request, exc: AppError):
+    return _envelope(exc.status_code, exc.code, exc.message)
+
+
+@app.exception_handler(RequestValidationError)
+async def _validation_error_handler(request: Request, exc: RequestValidationError):
+    details = "; ".join(
+        f"{'.'.join(str(p) for p in err['loc'] if p != 'body') or 'body'}: {err['msg']}" for err in exc.errors()
+    )
+    return _envelope(422, "VALIDATION_ERROR", f"Geçersiz istek: {details}")
+
+
+@app.exception_handler(StarletteHTTPException)
+async def _http_error_handler(request: Request, exc: StarletteHTTPException):
+    code = "NOT_FOUND" if exc.status_code == 404 else "HTTP_ERROR"
+    return _envelope(exc.status_code, code, str(exc.detail))
+
+
+@app.exception_handler(Exception)
+async def _unexpected_error_handler(request: Request, exc: Exception):
+    logger.error("Unexpected error on %s %s", request.method, request.url.path, exc_info=exc)
+    return _envelope(500, "INTERNAL_ERROR", "Beklenmeyen bir hata oluştu")
 
 
 @app.get("/health")
@@ -22,7 +59,7 @@ def create_account(data: AccountCreate):
 def get_account(account_id: str):
     account = store.accounts.get(account_id)
     if account is None:
-        raise HTTPException(status_code=404, detail="Account not found")
+        raise errors.account_not_found(account_id)
     return account
 
 
@@ -35,7 +72,7 @@ def create_transfer(req: TransferRequest, idempotency_key: str | None = Header(d
 def get_transfer(transfer_id: str):
     transfer = store.transfers.get(transfer_id)
     if transfer is None:
-        raise HTTPException(status_code=404, detail="Transfer not found")
+        raise errors.transfer_not_found(transfer_id)
     return transfer
 
 

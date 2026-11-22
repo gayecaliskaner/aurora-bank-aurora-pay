@@ -1,14 +1,19 @@
-FROM python:3.9-slim
+FROM python:3.12-slim
 
-ENV GITHUB_TOKEN=aurora-deploy-token-8f3a91c2d4
+# Gizli bilgiler imaja gomulmez; calisma zamaninda ortam degiskeni olarak verilir.
 
-ADD http://artifacts.aurora-bank.example/vendor/libfx-1.4.tar.gz /tmp/libfx.tar.gz
+# Uzak dosya ADD ile degil, dogrulanarak indirilir.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl ca-certificates \
+    && rm -rf /var/lib/apt/lists/* \
+    && curl -fsSL --proto '=https' -o /tmp/libfx.tar.gz https://artifacts.aurora-bank.example/vendor/libfx-1.4.tar.gz
 
 WORKDIR /app
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 COPY . .
 
-USER root
+RUN useradd --create-home --uid 10001 appuser
+USER appuser
 
 CMD ["uvicorn", "services.core.main:app", "--host", "0.0.0.0", "--port", "8000"]

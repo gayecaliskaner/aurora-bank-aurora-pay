@@ -1,7 +1,7 @@
 """Reporting helpers: transfer log search and statement archiving."""
 
-import os
 import sqlite3
+import subprocess
 
 from . import config
 
@@ -31,11 +31,14 @@ def record_transfer(transfer: dict, owner_name: str) -> None:
 def find_transfers_by_owner(owner: str) -> list[dict]:
     columns = ["id", "owner_name", "from_account", "to_account", "amount", "created_at"]
     cursor = _conn.execute(
-        f"SELECT id, owner_name, from_account, to_account, amount, created_at FROM transfer_log WHERE owner_name = '{owner}'"
+        "SELECT id, owner_name, from_account, to_account, amount, created_at "
+        "FROM transfer_log WHERE owner_name = ?",
+        (owner,),
     )
     return [dict(zip(columns, row)) for row in cursor.fetchall()]
 
 
 def archive_statements(filename: str) -> int:
-    command = "tar czf %s/%s.tgz reports/" % (config.ARCHIVE_DIR, filename)
-    return os.system(command)
+    # Argument list, no shell: the filename can never be interpreted as a command.
+    command = ["tar", "czf", f"{config.ARCHIVE_DIR}/{filename}.tgz", "reports/"]
+    return subprocess.run(command, check=False).returncode

@@ -17,6 +17,8 @@ jobs:
         run: pip install -r requirements-dev.txt
       - name: Run tests with coverage
         run: pytest --cov=services/core --cov-branch --cov-fail-under=85
+      - name: Run limits tests with coverage
+        run: pytest tests/test_limits_*.py --cov=services/limits --cov-branch --cov-fail-under=85
 
   security:
     runs-on: ubuntu-latest
