@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aurora Pay: İlk Gün - Bobathon Katılımcı Kılavuzu</title>
+<style>
+  :root{
+    --bg:#ffffff; --surface:#f7f8fa; --border:#e5e7eb; --text:#1f2328; --muted:#57606a;
+    --accent:#0f62fe; --accent-soft:#e8f0ff; --ok:#198038; --ok-soft:#e6f4ea;
+    --warn:#8a5a00; --warn-bg:#fff8e1; --danger:#a2191f; --danger-bg:#fff1f1;
+    --night:#161b2e; --night2:#232b47;
+    --code-bg:#161616; --code-fg:#f4f4f4;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;font:15px/1.7 -apple-system,"Segoe UI",system-ui,sans-serif;color:var(--text);background:var(--bg)}
+  .layout{display:flex;max-width:1200px;margin:0 auto}
+
+  /* ---------- Sol panel ---------- */
+  nav{position:sticky;top:0;align-self:flex-start;height:100vh;overflow:auto;width:268px;flex:none;padding:18px 14px;background:var(--night);color:#e6e9f5}
+  .progress{background:var(--night2);border-radius:8px;padding:14px;margin-bottom:14px}
+  .progress .lbl{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#9aa4c7}
+  .progress .num{font-size:18px;font-weight:700;margin:2px 0 8px}
+  .bar{height:8px;background:#38426a;border-radius:4px;overflow:hidden}
+  .bar>span{display:block;height:100%;width:0;background:#78a9ff;transition:width .3s}
+  nav .group{margin:14px 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:#8f99c0}
+  nav a{display:block;padding:5px 9px;border-radius:5px;color:#e6e9f5;text-decoration:none;font-size:13.5px}
+  nav a:hover{background:var(--night2);color:#fff}
+  nav a.done:after{content:" ✓";color:#78e08f;font-weight:700}
+
+  main{flex:1;min-width:0;padding:0 42px 80px}
+  h1{font-size:32px;line-height:1.2;margin:0 0 8px}
+  h2{font-size:23px;margin:0 0 6px}
+  h3{font-size:16.5px;margin:22px 0 8px}
+  p{margin:8px 0}
+  code{font:13px/1.4 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:var(--surface);border:1px solid var(--border);padding:1px 5px;border-radius:3px}
+  table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
+  th,td{border:1px solid var(--border);padding:7px 10px;text-align:left;vertical-align:top}
+  th{background:var(--surface)}
+  ul,ol{padding-left:22px}
+
+  /* ---------- Komut blokları ve Kopyala düğmesi ---------- */
+  pre{position:relative;background:var(--code-bg);color:var(--code-fg);padding:12px 84px 12px 16px;border-radius:6px;overflow:auto;margin:8px 0}
+  pre code{background:none;border:0;padding:0;color:inherit;font-size:13px;white-space:pre}
+  .copy{position:absolute;top:7px;right:7px;font:12px/1 -apple-system,"Segoe UI",system-ui,sans-serif;background:#393939;color:#f4f4f4;border:1px solid #6f6f6f;border-radius:4px;padding:5px 9px;cursor:pointer}
+  .copy:hover{background:#525252}
+  .copy.ok{background:var(--ok);border-color:var(--ok)}
+  td pre{margin:4px 0}
+
+  /* ---------- İşletim sistemi seçici ---------- */
+  .osbar{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid var(--border);padding:10px 0;margin:0 0 18px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-size:13.5px}
+  .osbar .lbl{color:var(--muted)}
+  .osbar button{font:inherit;padding:5px 14px;border:1px solid var(--border);background:var(--surface);border-radius:14px;cursor:pointer}
+  .osbar button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+  .on-win,.on-unix,.on-mac,.on-linux{display:none}
+  .is-win .on-win,.is-unix .on-unix,.is-mac .on-mac,.is-linux .on-linux{display:block}
+
+  /* ---------- Giriş ---------- */
+  .hero{background:var(--night);color:#fff;border-radius:10px;padding:28px 30px;margin-bottom:18px}
+  .hero .kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#a6c8ff}
+  .hero h1{color:#fff}
+  .hero p{color:#d6dbf0;font-size:16px}
+  .stats{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+  .stat{background:rgba(255,255,255,.1);border-radius:8px;padding:8px 14px;font-size:13px}
+  .stat b{display:block;font-size:19px;color:#a6c8ff}
+
+  section{margin-top:44px}
+  .story{border-top:1px solid var(--border);padding-top:14px}
+  .level{display:inline-block;background:var(--night);color:#fff;font-size:12px;font-weight:700;letter-spacing:.1em;padding:3px 10px;border-radius:4px;text-transform:uppercase}
+  .meta{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 14px}
+  .tag{font-size:12.5px;padding:2px 10px;border-radius:12px;background:var(--accent-soft);color:var(--accent);border:1px solid #c9dcff}
+  .tag.plain{background:var(--surface);color:var(--muted);border-color:var(--border)}
+
+  .msg{display:flex;gap:12px;margin:14px 0}
+  .avatar{flex:none;width:42px;height:42px;border-radius:50%;background:var(--accent);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:14px}
+  .avatar.red{background:var(--danger)} .avatar.gold{background:#b28600} .avatar.green{background:var(--ok)} .avatar.purple{background:#6f3fd0}
+  .bubble{background:var(--surface);border:1px solid var(--border);border-radius:0 12px 12px 12px;padding:10px 16px;flex:1;min-width:0}
+  .bubble .who{font-size:12.5px;font-weight:700;color:var(--muted);margin-bottom:2px}
+  .bubble p{margin:6px 0}
+
+  .deliver{border:2px solid var(--ok);background:var(--ok-soft);border-radius:8px;padding:10px 16px 6px;margin:14px 0}
+  .deliver h3{margin:0 0 4px;color:var(--ok);font-size:14px;text-transform:uppercase;letter-spacing:.08em}
+  .check{list-style:none;padding:0;margin:6px 0}
+  .check li{margin:6px 0}
+  .check label{cursor:pointer;display:flex;gap:9px;align-items:flex-start}
+  .check input{margin-top:6px;accent-color:var(--ok)}
+  .check input:checked+span{color:var(--muted);text-decoration:line-through}
+
+  .steps{border:1px solid var(--border);border-radius:8px;padding:2px 18px 12px;margin:14px 0}
+  .steps h3{color:var(--accent)}
+  .steps h3.verify-h{color:var(--ok)}
+  .box{border-left:4px solid var(--accent);background:var(--accent-soft);padding:9px 14px;border-radius:0 6px 6px 0;margin:12px 0}
+  .box.warn{border-color:#e0a100;background:var(--warn-bg)}
+  .box.danger{border-color:var(--danger);background:var(--danger-bg)}
+  .box>strong:first-child{display:block}
+
+  details{border:1px solid var(--border);border-radius:6px;margin:8px 0;background:var(--surface)}
+  summary{cursor:pointer;padding:8px 12px;font-weight:600;font-size:14px}
+  details>div{padding:0 14px 10px}
+
+  .status{margin-top:16px;border:2px dashed var(--border);border-radius:8px;padding:10px 16px;color:var(--muted);font-size:13px;font-weight:600;letter-spacing:.04em}
+  .status:after{content:"Teslim edilecekler bekliyor"}
+  section.done .status{border-color:var(--ok);background:var(--ok-soft);color:var(--ok)}
+  section.done .status:after{content:"Görev tamamlandı"}
+
+  .explain{margin:-2px 0 14px;padding:8px 14px;border-left:3px solid var(--border);background:var(--surface);border-radius:0 6px 6px 0;font-size:13.5px}
+  .explain p{margin:4px 0}
+  .explain details{margin:6px 0 2px;background:#fff}
+  .explain summary{font-size:13.5px;color:var(--danger)}
+  .explain ul{margin:2px 14px 8px;padding-left:18px}
+  .explain li{margin:5px 0}
+  .explain pre{margin:6px 0}
+
+  .flow{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0;font-size:13px}
+  .flow span{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:4px 10px}
+  .flow span.arrow{border:0;background:none;padding:4px 0;color:var(--muted)}
+
+  footer{margin-top:60px;padding-top:14px;border-top:1px solid var(--border);color:var(--muted);font-size:12px;text-align:center}
+  @media (max-width:880px){nav{display:none}main{padding:0 18px 60px}}
+  @media print{nav,.osbar,.copy{display:none}main{padding:0}details{break-inside:avoid}pre{padding-right:16px}}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<nav>
+  <div class="progress">
+    <div class="lbl">İlerleme</div>
+    <div class="num"><span id="done">0</span> / <span id="total">0</span> teslim edildi</div>
+    <div class="bar"><span id="bar"></span></div>
+  </div>
+  <a href="#hikaye">Hikâye</a>
+  <a href="#yolculuk">Tek sayfada yolculuk</a>
+  <a href="#program">Program (3 saat)</a>
+  <a href="#onkosul">Ön koşullar</a>
+  <div class="group">Görevler</div>
+  <a href="#m0" data-m="0">0 · Onboarding ve ortam kurulumu</a>
+  <a href="#m1" data-m="1">1 · Limit servisi geliştirme</a>
+  <a href="#m2" data-m="2">2 · SEV-2 alarmı</a>
+  <a href="#m3" data-m="3">3 · QA standardı ve Custom Mode</a>
+  <a href="#m4" data-m="4">4 · Test coverage</a>
+  <a href="#m5" data-m="5">5 · Pentest bulgularının kapatılması</a>
+  <a href="#m6" data-m="6">6 · Vendor SDK incelemesi ve PII koruması</a>
+  <a href="#m7" data-m="7">7 · Maliyet analizi ve bütçe önerisi</a>
+  <a href="#m8" data-m="8">8 · Pull Request ve CI</a>
+  <div class="group">Ek</div>
+  <a href="#cep">Komutlar</a>
+  <a href="#sorun">Sorun giderme</a>
+  <a href="#final">Final</a>
+</nav>
+
+<main>
+
+<div class="osbar" id="osbar">
+  <span class="lbl">İşletim sisteminiz:</span>
+  <button type="button" data-os="win">Windows</button>
+  <button type="button" data-os="mac">macOS</button>
+  <button type="button" data-os="linux">Linux</button>
+  <span class="lbl">Komutlar seçime göre değişir. Her komut kendi kutusunda, <strong>Kopyala</strong> düğmesiyle alınır.</span>
+</div>
+
+<!-- ======================= GİRİŞ ======================= -->
+<div class="hero">
+  <div class="kicker">Bobathon · 3 saat · 9 görev</div>
+  <h1>Aurora Pay: İlk Gün</h1>
+  <p>Aurora Bank'ın Instant Pay ekibine bu sabah katıldınız. Masanız hazır, bilgisayarınız açık, yanınızda yeni bir iş arkadaşınız var: <strong>Bob</strong>.
+  Bu program boyunca ekibin dokuz isteğini yerine getireceksiniz. Her istek Bob'un farklı bir özelliğini tanıtır.</p>
+  <div class="stats">
+    <div class="stat"><b>9</b>görev</div>
+    <div class="stat"><b>180 dk</b>görev süresi</div>
+    <div class="stat"><b>3 saat</b>toplam program</div>
+  </div>
+</div>
+
+<section id="hikaye" class="story">
+  <h2>Hikâye</h2>
+  <p>Instant Pay, Aurora Bank'ın anlık para transferi ürünü ve canlıya çıkışa az kaldı. Masada birkaç iş bekliyor:
+  BDDK uyumu için transfer limitleri henüz yazılmadı, canlıda açık bir SEV-2 var, bilgi güvenliği pentest bulgularını gönderdi, CFO da Bob'un maliyetini soruyor.</p>
+  <p>Ekip lideri size güveniyor. Durumu okuyacak, hedefi anlayacak ve Bob'a kendi cümlelerinizle yön vereceksiniz. Asıl önemli olan, Bob'un <strong>ne ürettiği</strong>.
+  Bunu her görevin sonundaki <strong>Doğrulama</strong> adımı gösterir.</p>
+
+  <div class="box">
+    <strong>Nasıl çalışır?</strong>
+    Her görev aynı sırayla ilerler: önce <strong>İstek</strong> (ekiplerden veya ekip liderinden gelen mesaj: ne oldu, ne isteniyor), sonra <strong>Adımlar</strong> (sırayla yapılacaklar; dikkat etmeniz gereken bulgu ve notlar ilgili adımın içinde yer alır, son adım <strong>Doğrulama</strong>, yani otomatik kontroldür), en sonda <strong>Teslim edilecekler</strong> (işaretlenecek liste).
+    <br><br>Her komut kutusunun altında gri bir açıklama bulunur: <strong>Ne yapar?</strong> (komut ne çalıştırır), <strong>Neden?</strong> (bu adım neden gerekli), <strong>Beklenen çıktı</strong> (doğru çalıştığında ne görmelisiniz) ve <strong>Hata verirse</strong> (açılır liste: terminalde şu hata çıkarsa şunu yapın).
+  </div>
+
+  <h3>Doğrulamayı okumak</h3>
+  <p>Her görevin sonunda sonucu doğrulamak için aşağıdaki komutu kullanabilirsiniz. <code>mN</code> yerine görev numarasını yazın (ör. <code>m1</code>):</p>
+<pre><code>{py} verify/run.py m1</code></pre>
+<div class="explain"><p><strong>Ne yapar?</strong> Doğrulayıcıyı (<code>verify/run.py</code>) başlatır. Seçtiğiniz görev için (burada <code>m1</code>) hazırlanmış otomatik testleri sırayla çalıştırır ve her kontrol için <code>[PASS]</code>, <code>[FAIL]</code> ya da <code>[SKIP]</code> yazar. Komuttaki <code>{py}</code>, üstteki işletim sistemi seçimine göre kendiliğinden <code>python3</code> (macOS/Linux) ya da <code>py</code> (Windows) olur; Kopyala düğmesi de bu hâliyle kopyalar.</p><p><strong>Neden?</strong> Bob &quot;tamam&quot; dese bile işin gerçekten çalıştığını sözle değil, koda bakan bir testle görmek için. Her görev bu komutla biter.</p><p><strong>Beklenen çıktı:</strong> Kontrollerin listesi ve en sonda bir özet satırı, örneğin <code>M0 Kurulum: PASS  7/7 kontrol</code>. Göreve başlamadan önce M1–M8 için FAIL görmeniz normaldir; henüz hiçbir şey yapmadınız.</p><details><summary>Hata verirse</summary><ul><li><strong><code>python3: command not found</code> / <code>'python3' is not recognized</code></strong> Windows'ta komut <code>py</code> ile başlamalıdır. Sayfanın üstündeki seçicide <strong>Windows</strong>'u seçin, komut kendiliğinden değişir. macOS/Linux'ta Python kurulu değildir: <a href="#onkosul">Ön koşullar</a> 1. adım.</li><li><strong><code>ModuleNotFoundError</code> / <code>No module named ...</code></strong> Kurulum eksik ya da yarım kalmış. Repo kökünde kurulumu yeniden çalıştırın (güvenlidir, var olanı yeniden kullanır), sonra komutu tekrarlayın:<pre><code>{py} setup.py</code></pre></li><li><strong><code>can't open file ... verify/run.py</code> / <code>No such file or directory</code></strong> Yanlış klasördesiniz. Klonladığınız klasörün içine girin (<code>cd &lt;repo-adi&gt;</code>); <code>setup.py</code> dosyasını görüyorsanız doğru yerdesiniz.</li><li><strong><code>[FAIL]</code></strong> Terminalin hata verdiği anlamına gelmez; &quot;bu kontrol henüz sağlanmadı&quot; demektir. Altındaki <code>-&gt;</code> satırı neyin eksik olduğunu söyler.</li></ul></details></div>
+  <p>Tüm görevleri tek seferde görmek için:</p>
+<pre><code>{py} verify/run.py all</code></pre>
+<div class="explain"><p><strong>Ne yapar?</strong> Dokuz görevin (M0–M8) doğrulayıcısını art arda çalıştırır.</p><p><strong>Neden?</strong> Genel durumu tek bakışta görmek ve toplam durumu ekip liderine göstermek için.</p><p><strong>Beklenen çıktı:</strong> Her görev için bir blok ve en sonda <code>=== OZET ===</code> altında görev başına bir satır: <code>PASS M0 Kurulum 7/7</code>, <code>FAIL M1 ... 0/35</code> gibi. Tamamı birkaç saniye sürer. Henüz yapmadığınız görevlerin FAIL görünmesi beklenir.</p><details><summary>Hata verirse</summary><ul><li><strong>Çok uzun sürüyor</strong> M4 ve M5 kontrolleri kod çalıştırdığı için daha yavaştır; bekleyin. Yalnızca üzerinde çalıştığınız görevi görmek için <code>verify/run.py m4</code> gibi tek görev numarası verin.</li><li><strong>Bir görev FAIL</strong> O görevi tek başına çalıştırıp <code>-&gt;</code> satırlarını okuyun; <code>all</code> çıktısı uzun olduğu için ayrıntı kolay kaybolur.</li></ul></details></div>
+  <ul>
+    <li><strong>PASS</strong>: geçti. <strong>FAIL</strong> satırının altındaki <code>-&gt;</code> satırı neyin eksik olduğunu söyler. Önce onu okuyun, cevap çoğunlukla oradadır.</li>
+    <li><strong>SKIP</strong>: manuel kontrol demek (ör. <code>gh</code> kurulu değilken PR). Ekip liderine gösterin; görev <code>PASS*</code> sayılır.</li>
+  </ul>
+
+  <h3>Takılırsanız</h3>
+  <p>Önce adımın altındaki <em>Hata verirse</em> listesine bakın, sonra <a href="#sorun">Sorun giderme</a> tablosuna. Yine de çözemezseniz ekip liderinizden yardım isteyin.</p>
+</section>
+
+<section id="yolculuk" class="story">
+  <h2>Tek sayfada yolculuk</h2>
+  <div class="flow">
+    <span>Ön koşullar</span><span class="arrow">→</span><span>0 · Onboarding</span><span class="arrow">→</span><span>1 · Limit servisi</span><span class="arrow">→</span><span>2 · SEV-2</span><span class="arrow">→</span><span>3 · QA Custom Mode</span><span class="arrow">→</span><span>4 · Test coverage</span><span class="arrow">→</span><span>5 · Pentest</span><span class="arrow">→</span><span>6 · Vendor SDK / PII</span><span class="arrow">→</span><span>7 · Maliyet analizi</span><span class="arrow">→</span><span>8 · Pull Request ve CI</span>
+  </div>
+  <table>
+    <thead><tr><th>Görev</th><th>Hikâye</th><th>Bob özelliği</th><th>Çıktı</th><th>Süre</th></tr></thead>
+    <tbody>
+      <tr><td><a href="#m0">0 · Onboarding ve ortam kurulumu</a></td><td>Repoyu kur, servisi ayağa kaldır, Bob'la tanış</td><td>Mod seçici, <code>@</code> bağlamı</td><td>Çalışan kurulum, <code>feature/</code> branch'i</td><td>20 dk</td></tr>
+      <tr><td><a href="#m1">1 · Limit servisi geliştirme</a></td><td>BDDK uyumu için transfer limiti, kod yok</td><td>Plan / Agent, todo list</td><td><code>services/limits</code></td><td>25 dk</td></tr>
+      <tr><td><a href="#m2">2 · SEV-2 alarmı</a></td><td>Müşterilerin parası iki kez düşüyor</td><td><strong>Bob Shell / CLI</strong></td><td>4 şikâyet kapalı</td><td>20 dk</td></tr>
+      <tr><td><a href="#m3">3 · QA standardı ve Custom Mode</a></td><td>Ekip standardını Bob'a kalıcı öğret</td><td><strong>Custom Mode + Rules + Skills</strong></td><td><code>.bob/</code> altında Mode, Rules, Skill</td><td>20 dk</td></tr>
+      <tr><td><a href="#m4">4 · Test coverage</a></td><td>Release gate: %85 coverage</td><td>M3'te kurduğunuz Custom Mode</td><td>≥ 25 test</td><td>25 dk</td></tr>
+      <tr><td><a href="#m5">5 · Pentest bulgularının kapatılması</a></td><td>Pentest bulguları canlıyı blokluyor</td><td><strong>Bob Findings</strong>, Fix with Bob</td><td>0 bulgu</td><td>20 dk</td></tr>
+      <tr><td><a href="#m6">6 · Vendor SDK incelemesi ve PII koruması</a></td><td>Şüpheli SDK, hassas müşteri verisi</td><td>Prompt injection, <code>.bobignore</code></td><td>Güvenlik görüşü, özet rapor</td><td>20 dk</td></tr>
+      <tr><td><a href="#m7">7 · Maliyet analizi ve bütçe önerisi</a></td><td>"Bu bize kaça mal oluyor?"</td><td><strong>Bobcoin, Bob Admin, Bobalytics</strong></td><td>Ölçüm notu</td><td>15 dk</td></tr>
+      <tr><td><a href="#m8">8 · Pull Request ve CI</a></td><td>Dal, commit, PR, yeşil CI</td><td>Bob ile Git iş akışı</td><td>Açık PR</td><td>15 dk</td></tr>
+    </tbody>
+  </table>
+  <p>Toplam görev süresi <strong>180 dk</strong>. Görevler büyük ölçüde bağımsızdır; iki istisna: <strong>M4</strong>, M3'te yazdığınız Custom Mode'u kullanır, <strong>M8</strong> önceki işlerin commit'lenmesini bekler.</p>
+</section>
+
+<section id="program" class="story">
+  <h2>Program (3 saat)</h2>
+  <table>
+    <thead><tr><th>Saat</th><th>İçerik</th><th>Süre</th></tr></thead>
+    <tbody>
+      <tr><td>13:00 – 13:15</td><td>Karşılama ve Kayıt</td><td>15 dk</td></tr>
+      <tr><td>13:15 – 13:30</td><td>Tanıtım ve Ortam Kurulumu (<a href="#m0">M0</a>)</td><td>15 dk</td></tr>
+      <tr><td>13:30 – 13:45</td><td>Enterprise Scaled AI: watsonx Ailesi</td><td>15 dk</td></tr>
+      <tr><td>13:45 – 13:50</td><td>Uygulamalı Bobathon: Aurora Pay Case Tanıtımı</td><td>5 dk</td></tr>
+      <tr><td>13:50 – 14:15</td><td>Aurora Pay Case: Adım 1–3 (<a href="#m1">M1</a>, <a href="#m2">M2</a>, <a href="#m3">M3</a>)</td><td>25 dk</td></tr>
+      <tr><td>14:15 – 14:30</td><td>DevSecOps Tanıtımı ve Demo</td><td>15 dk</td></tr>
+      <tr><td>14:30 – 14:50</td><td>Aurora Pay Case: Adım 4–5 (<a href="#m4">M4</a>, <a href="#m5">M5</a>)</td><td>20 dk</td></tr>
+      <tr><td>14:50 – 15:00</td><td>Mola</td><td>10 dk</td></tr>
+      <tr><td>15:00 – 15:30</td><td>Aurora Pay Case: Adım 6–8 (<a href="#m6">M6</a>, <a href="#m7">M7</a>, <a href="#m8">M8</a>)</td><td>30 dk</td></tr>
+      <tr><td>15:30 – 15:45</td><td>IBM Bob On-Prem Tanıtımı ve Demo</td><td>15 dk</td></tr>
+      <tr><td>15:45 – 16:00</td><td>Soru &amp; Cevap</td><td>15 dk</td></tr>
+    </tbody>
+  </table>
+
+</section>
+
+<section id="onkosul" class="story">
+  <h2>Ön koşullar</h2>
+  <p>Programdan <strong>önce</strong> tamamlayın.</p>
+
+  <div class="on-win"><h3>1. Python 3.12 (zorunlu)</h3>
+  <p>Windows'ta Semgrep yalnızca Python 3.12 ile kurulabildiği için 3.12 kurmak <strong>zorunludur</strong>; başka bir sürüm kullanmayın. Sürümü kontrol edin:</p></div>
+  <div class="on-unix"><h3>1. Python 3.11 veya üzeri</h3>
+  <p>Kurulum betiği <strong>Python 3.11 veya üzerini</strong> ister; 3.12 şart değildir. Sürümü kontrol edin:</p></div>
+<pre><code>{py} --version</code></pre>
+<div class="explain"><p><strong>Ne yapar?</strong> Kurulu Python'un sürümünü yazdırır.</p><p><strong>Neden?</strong> Kurulum betiği, doğrulayıcı ve Semgrep <strong>Python 3.12</strong> ile çalışacak şekilde hazırlandı. Windows'ta başka sürümlerde Semgrep kurulumu başarısız olur. Windows'ta komut <code>py -3.12</code> olarak yazılır; böylece özellikle 3.12 seçilir.</p><p><strong>Beklenen çıktı:</strong> <code>Python 3.12.x</code>. Başka bir sürüm görüyorsanız aşağıdaki kurulum komutunu çalıştırın.</p><details><summary>Hata verirse</summary><ul><li><strong><code>command not found</code> / <code>'py' is not recognized</code></strong> Python kurulu değil ya da terminal bunu henüz bilmiyor. Aşağıdaki kurulum komutunu çalıştırın, sonra <strong>terminali kapatıp yeniden açın</strong>.</li><li><strong>Windows'ta Microsoft Store açılıyor</strong> Boş bir &quot;python&quot; kısayolu devreye giriyor. Gerçek Python'u aşağıdaki <code>winget</code> komutuyla ya da python.org'dan kurun ve komutu <code>py --version</code> olarak çalıştırın.</li><li><strong>Sürüm 3.12 değil (ör. 3.10, 3.11 ya da 3.13)</strong> Aşağıdaki komutla 3.12'yi kurun. Eski sürümün silinmesi gerekmez ama <code>{py} --version</code> <code>3.12.x</code> göstermelidir.</li></ul></details></div>
+  <div class="on-win"><p>Kurulu değilse ya da sürüm 3.12 değilse:</p></div>
+  <div class="on-unix"><p>Kurulu değilse ya da sürüm 3.11'den eskiyse:</p></div>
+  <div class="on-win"><pre><code>winget install --id Python.Python.3.12 -e</code></pre></div>
+  <div class="on-mac"><pre><code>brew install python@3.12</code></pre></div>
+  <div class="on-linux"><pre><code>sudo apt install python3 python3-venv python3-pip</code></pre></div>
+<div class="explain"><p><strong>Ne yapar?</strong> Python 3.12'yi paket yöneticisiyle kurar. <code>winget</code> Windows'un, <code>brew</code> macOS'ta Homebrew'un, <code>apt</code> Debian/Ubuntu'nun paket yöneticisidir. Linux komutundaki <code>python3-venv</code> venv (virtual environment) bileşenidir; <code>setup.py</code> bunu kullanır.</p><p><strong>Neden?</strong> Python'u elle indirip kurmak yerine tek satırda, doğru sürümle ve PATH ayarıyla kurmak için.</p><p><strong>Beklenen çıktı:</strong> İndirme ve kurulum ilerleme satırları; sonunda hatasız dönüş. Ardından yeni bir terminalde <code>{py} --version</code> komutuyla kontrol edin.</p><details><summary>Hata verirse</summary><ul><li><strong>Windows: <code>winget : The term 'winget' is not recognized</code></strong> Eski Windows 10'da App Installer eksiktir. Microsoft Store'dan <em>App Installer</em>'ı güncelleyin ya da python.org/downloads adresinden yükleyiciyi indirin; kurarken <strong>Add python.exe to PATH</strong> kutusunu işaretleyin.</li><li><strong>macOS: <code>brew: command not found</code></strong> Homebrew kurulu değil. brew.sh adresindeki kurulum komutunu çalıştırın ya da python.org'dan macOS paketini indirin.</li><li><strong>Linux: <code>Permission denied</code> / <code>are you root?</code></strong> Komutun başında <code>sudo</code> olmalı. Yönetici yetkiniz yoksa BT destek ekibinden yardım isteyin.</li><li><strong>Kurulum bitti ama eski sürüm görünüyor</strong> Terminal PATH'i yalnızca açılışta okur. Terminali kapatıp yeniden açın. Linux'ta <code>python3 --version</code> ile de bakın.</li></ul></details></div>
+
+  <h3>2. git</h3>
+<pre><code>git --version</code></pre>
+<div class="explain"><p><strong>Ne yapar?</strong> Kurulu git'in sürümünü yazdırır.</p><p><strong>Neden?</strong> Repoyu klonlamak, dal açmak, commit ve push yapmak için git gerekir.</p><p><strong>Beklenen çıktı:</strong> <code>git version 2.x.y</code> gibi bir satır.</p><details><summary>Hata verirse</summary><ul><li><strong><code>command not found</code> / <code>'git' is not recognized</code></strong> Git kurulu değil. Hemen altındaki kurulum komutunu çalıştırın, sonra yeni bir terminal açın.</li></ul></details></div>
+  <div class="on-win"><pre><code>winget install --id Git.Git -e</code></pre></div>
+  <div class="on-mac"><pre><code>brew install git</code></pre></div>
+  <div class="on-linux"><pre><code>sudo apt install git</code></pre></div>
+<div class="explain"><p><strong>Ne yapar?</strong> Git'i kurar (<code>winget</code>: Windows, <code>brew</code>: macOS, <code>apt</code>: Linux).</p><p><strong>Neden?</strong> Yukarıdaki sürüm komutu hata verdiyse kurmak için.</p><p><strong>Beklenen çıktı:</strong> Kurulum ilerleme satırları. Bittiğinde yeni terminalde <code>git --version</code> bir sürüm yazdırmalı.</p><details><summary>Hata verirse</summary><ul><li><strong><code>winget</code> / <code>brew</code> / <code>sudo</code> hataları</strong> Python kurulumundaki aynı hatalardır; yukarıdaki &quot;Hata verirse&quot; kutusundaki çözümler burada da geçerlidir.</li></ul></details></div>
+
+  <h3>3. Bob IDE</h3>
+  <p>Bob IDE kurulu ve giriş yapılmış olmalı. İndirme bağlantısı platformunuza uygun paketi seçer; yine de indirme sayfasındaki platform seçimini kontrol edin.</p>
+
+  <h3>4. Bob Shell</h3>
+  <p>Kurulum komutu işletim sisteminize göre değişir:</p>
+  <div class="on-mac"><pre><code>curl -fsSL https://bob.ibm.com/download/bobshell.sh | sudo bash</code></pre></div>
+  <div class="on-linux"><pre><code>curl -fsSL https://bob.ibm.com/download/bobshell.sh | bash</code></pre></div>
+  <div class="on-win"><pre><code>powershell -ep Bypass "iwr https://bob.ibm.com/download/bobshell.ps1 -OutFile $env:TMP\bob.ps1; &amp;$env:TMP\bob.ps1"</code></pre></div>
+<div class="explain"><p><strong>Ne yapar?</strong> Bob Shell kurulum betiğini indirip çalıştırır. macOS/Linux'ta <code>curl</code> betiği indirir ve doğrudan <code>bash</code>'e verir; macOS komutundaki <code>sudo</code> betiği yönetici yetkisiyle çalıştırır ve parolanızı ister (yazarken ekranda görünmez). Windows'ta PowerShell betiği geçici klasöre (<code>$env:TMP</code>) indirir ve çalıştırır; <code>-ep Bypass</code> yalnızca bu çalıştırma için betik çalıştırma kısıtını atlar.</p><p><strong>Neden?</strong> Terminalde <code>bob</code> komutunu kurar. M2 ve M7 doğrudan terminaldeki Bob'la yapılır; bu komut olmadan o görevler yapılamaz.</p><p><strong>Beklenen çıktı:</strong> İndirme ve kurulum satırları, sonunda kurulumun bittiğini söyleyen bir mesaj. Komut bittikten sonra <code>bob --version</code> ile kontrol edeceksiniz.</p><details><summary>Hata verirse</summary><ul><li><strong>macOS/Linux: <code>curl: command not found</code></strong> Önce <code>curl</code> kurun (Debian/Ubuntu: <code>sudo apt install curl</code>), sonra komutu tekrarlayın.</li><li><strong>Windows: <code>running scripts is disabled</code> / execution policy</strong> Komutun <strong>tamamını</strong>, <code>-ep Bypass</code> dahil, yeni bir PowerShell penceresine yapıştırdığınızdan emin olun. Kurum politikası yine engelliyorsa aşağıdaki npm alternatifini kullanın.</li><li><strong><code>Could not resolve host</code> / SSL / zaman aşımı</strong> Ağ ya da kurumsal proxy sorunu. VPN'i kapatıp açmayı ya da farklı bir ağı deneyin; olmazsa npm alternatifini kullanın.</li><li><strong>Kurulum bitti ama <code>bob</code> bulunamıyor</strong> Terminali kapatıp yeniden açın. Ayrıntı: aşağıdaki <code>bob --version</code> açıklaması.</li></ul></details></div>
+  <p>Alternatif (Node.js varsa):</p>
+<pre><code>npm install --registry=https://registry.npmjs.org/ --allow-scripts=@officecli/officecli -g @ibm/bob</code></pre>
+<div class="explain"><p><strong>Ne yapar?</strong> Bob Shell'i Node.js'in paket yöneticisi npm ile bilgisayar genelinde (<code>-g</code>) kurar. <code>--registry</code> paketin resmî npm sunucusundan alınmasını sağlar; <code>--allow-scripts=...</code> bu pakete ait kurulum betiğinin çalışmasına izin verir.</p><p><strong>Neden?</strong> Yukarıdaki kurulum betiği çalışmadıysa (ör. betik çalıştırma engelliyse) ya da Node.js zaten kuruluysa ikinci bir yol olarak.</p><p><strong>Beklenen çıktı:</strong> <code>added N packages</code> benzeri bir satır; hata mesajı olmamalı.</p><details><summary>Hata verirse</summary><ul><li><strong><code>npm: command not found</code></strong> Node.js kurulu değil. nodejs.org adresinden LTS sürümünü kurun, yeni terminal açıp komutu tekrarlayın.</li><li><strong><code>EACCES: permission denied</code> (macOS/Linux)</strong> npm'in genel klasörüne yazma izniniz yok. Bu komutu <code>sudo</code> ile çalıştırmak yerine yukarıdaki betikle kurulumu tercih edin; olmuyorsa ekip liderine danışın.</li><li><strong><code>ENOTFOUND</code> / <code>ETIMEDOUT</code></strong> Ağ ya da proxy sorunu; başka bir ağı deneyin.</li><li><strong><code>unknown option</code> / <code>--allow-scripts</code> tanınmıyor</strong> npm sürümünüz eski. Node.js'i güncelleyin ve komutu tekrarlayın.</li></ul></details></div>
+  <p>Kurulumu doğrulayın. Yeni bir terminal açmanız gerekebilir:</p>
+<pre><code>bob --version</code></pre>
+<div class="explain"><p><strong>Ne yapar?</strong> Bob Shell'in kurulu olduğunu ve terminalin <code>bob</code> komutunu bulabildiğini sürüm yazdırarak gösterir.</p><p><strong>Neden?</strong> M2 ve M7'de terminalden <code>bob</code> çalıştıracaksınız; sorun varsa o gün değil şimdi çıkması için.</p><p><strong>Beklenen çıktı:</strong> Bir sürüm numarası.</p><details><summary>Hata verirse</summary><ul><li><strong><code>bob: command not found</code> / <code>'bob' is not recognized</code></strong> Önce <strong>yeni bir terminal</strong> açın; PATH değişikliği yalnızca yeni terminallerde görünür. Hâlâ yoksa kurulum çıktısındaki hata mesajına bakın ya da diğer kurulum yöntemini deneyin.</li><li><strong>Windows: <code>bob.ps1 cannot be loaded because running scripts is disabled</code></strong> PowerShell betik çalıştırmayı engelliyor. Bir kez şunu çalıştırıp yeni terminal açın:<pre><code>Set-ExecutionPolicy -Scope CurrentUser RemoteSigned</code></pre></li></ul></details></div>
+
+  <h3>5. <code>BOB_API_KEY</code></h3>
+  <p>Bob Shell (Görev 2 ve Görev 7) bir API key ister. Key'i şuradan alın: <a href="https://bob.ibm.com/admin/subscription">https://bob.ibm.com/admin/subscription</a></p>
+  <ol>
+    <li>Adresi açıp IBM hesabınızla giriş yapın.</li>
+    <li>Subscription sayfasındaki API key bölümünde yeni bir key oluşturun.</li>
+    <li><strong>Scope</strong> olarak <strong>Inference</strong> seçin. "General" scope'lu bir key kullanırsanız komutlara ayrıca <code>--team-id</code> eklemeniz gerekir.</li>
+    <li>Key değerini hemen kopyalayıp güvenli bir yere kaydedin. Key oluşturulduktan sonra <strong>bir daha gösterilmez</strong>; kimseyle paylaşmayın.</li>
+  </ol>
+  <p>Yalnızca açık terminal için:</p>
+  <div class="on-unix"><pre><code>export BOB_API_KEY="&lt;anahtarınız&gt;"</code></pre></div>
+  <div class="on-win"><pre><code>$env:BOB_API_KEY="&lt;anahtarınız&gt;"</code></pre></div>
+<div class="explain"><p><strong>Ne yapar?</strong> API anahtarınızı <strong>yalnızca açık olan bu terminal oturumunda</strong> ortam değişkeni olarak tanımlar. <code>&lt;anahtarınız&gt;</code> yerine kendi anahtarınızı yazın; tırnaklar kalsın, <code>&lt; &gt;</code> işaretleri gitsin. macOS/Linux'ta <code>export</code>, Windows PowerShell'de <code>$env:</code> kullanılır; birini diğerinin yerine yazarsanız çalışmaz.</p><p><strong>Neden?</strong> Bob Shell, Bob'un modeline bağlanırken kim olduğunuzu bu değişkenden okur. Tanımlı değilse <code>bob chat</code> ve <code>bob run</code> kimlik hatası verir.</p><p><strong>Beklenen çıktı:</strong> Komut sessizce biter, ekrana bir şey yazmaz. Tanımlandığını Görev 0, Adım 1'deki komutla göreceksiniz.</p><details><summary>Hata verirse</summary><ul><li><strong>Terminali kapattım, anahtar kayboldu</strong> Bu yöntem yalnızca açık terminal içindir. Kalıcı yöntemi (hemen aşağıda) kullanın ya da her yeni terminalde bu komutu tekrarlayın.</li><li><strong><code>bob chat</code> sonrası <code>401</code> / <code>Unauthorized</code> / invalid API key</strong> Anahtarın scope'u <strong>Inference</strong> olmalıdır. Bob Admin portalında Inference scope'lu yeni bir anahtar oluşturup yeniden tanımlayın. Kopyalarken başta ya da sonda boşluk kalmadığına bakın.</li><li><strong><code>export : The term 'export' is not recognized</code> (Windows)</strong> PowerShell'de <code>export</code> yoktur; <code>$env:BOB_API_KEY=&quot;...&quot;</code> biçimini kullanın.</li></ul></details></div>
+  <p>Kalıcı olması için:</p>
+  <div class="on-win"><pre><code>[System.Environment]::SetEnvironmentVariable('BOB_API_KEY','&lt;anahtarınız&gt;','User')</code></pre><p>Ardından terminali kapatıp yeniden açın.</p></div>
+  <div class="on-mac"><pre><code>echo 'export BOB_API_KEY="&lt;anahtarınız&gt;"' &gt;&gt; ~/.zshrc</code></pre><p>Ardından terminali kapatıp yeniden açın.</p></div>
+  <div class="on-linux"><pre><code>echo 'export BOB_API_KEY="&lt;anahtarınız&gt;"' &gt;&gt; ~/.bashrc</code></pre><p>Ardından terminali kapatıp yeniden açın.</p></div>
+<div class="explain"><p><strong>Ne yapar?</strong> Anahtarı <strong>kalıcı</strong> yapar. Windows'ta kullanıcı düzeyinde ortam değişkeni olarak kaydeder. macOS'ta <code>~/.zshrc</code>, Linux'ta <code>~/.bashrc</code> dosyasının sonuna <code>export</code> satırını ekler; <code>&gt;&gt;</code> &quot;sona ekle&quot; demektir, dosyanın var olan içeriğini silmez.</p><p><strong>Neden?</strong> Her yeni terminalde anahtarı yeniden yazmamak için.</p><p><strong>Beklenen çıktı:</strong> Komut sessiz biter. Terminali kapatıp yeniden açın, sonra Görev 0, Adım 1'deki komutla <code>BOB_API_KEY tanımlı</code> yazısını görün.</p><details><summary>Hata verirse</summary><ul><li><strong>Anahtar yeni terminalde de yok</strong> Kapattığınız terminal yerine <strong>yeni açılan</strong> terminalde bakın. Mevcut terminal eski ortamı tutmaya devam eder.</li><li><strong>macOS: <code>zsh</code> yerine <code>bash</code> kullanıyorum</strong> <code>echo $SHELL</code> komutuna bakın. <code>/bin/bash</code> görüyorsanız komuttaki <code>~/.zshrc</code> yerine <code>~/.bash_profile</code> yazın.</li><li><strong>Anahtarı değiştirmem gerekiyor</strong> Dosyayı bir editörle açıp eski <code>BOB_API_KEY</code> satırını silin ya da yenisini altına ekleyin; en alttaki geçerli olur. Windows'ta komutu yeni değerle tekrar çalıştırmanız yeterlidir.</li></ul></details></div>
+
+  <h3>6. GitHub</h3>
+  <ul>
+    <li>Bob IDE'de GitHub oturumunuz açık olmalı (hesap simgesi → GitHub ile oturum aç).</li>
+    <li>GitHub CLI (<code>gh</code>) kurulu ve oturum açık olmalı:</li>
+  </ul>
+  <div class="on-win"><pre><code>winget install --id GitHub.cli</code></pre></div>
+  <div class="on-mac"><pre><code>brew install gh</code></pre></div>
+  <div class="on-linux"><p>Kurulum için <a href="https://github.com/cli/cli#installation">github.com/cli/cli#installation</a> sayfasındaki dağıtımınıza uygun yönergeyi izleyin.</p></div>
+<div class="explain"><p><strong>Ne yapar?</strong> GitHub CLI'ı (<code>gh</code>) kurar: <code>winget</code> Windows'ta, <code>brew</code> macOS'ta. Linux için yukarıdaki bağlantı dağıtımınıza uygun yönergeyi verir.</p><p><strong>Neden?</strong> M8'de Pull Request açmak ve CI sonucunu terminalden izlemek için.</p><p><strong>Beklenen çıktı:</strong> Kurulum ilerleme satırları. Ardından yeni terminalde <code>gh --version</code> bir sürüm yazdırır.</p><details><summary>Hata verirse</summary><ul><li><strong><code>winget</code> / <code>brew</code> bulunamadı</strong> Python kurulumundaki aynı çözümler geçerlidir (yukarıdaki &quot;Hata verirse&quot; kutusu).</li><li><strong>Kurulum sonrası <code>gh: command not found</code></strong> Terminali kapatıp yeniden açın.</li></ul></details></div>
+<pre><code>gh auth login</code></pre>
+<div class="explain"><p><strong>Ne yapar?</strong> GitHub hesabınızla oturum açar ve <code>gh</code>'ın sizin adınıza işlem yapmasını yetkilendirir. Sırayla sorar: <em>GitHub.com</em>, <em>HTTPS</em> ve giriş yöntemi olarak <em>Login with a web browser</em> seçin. Ekranda 8 haneli bir kod görünür; açılan GitHub sayfasına yapıştırıp onaylayın.</p><p><strong>Neden?</strong> Push, PR açma ve CI sorgulama GitHub'da kim olduğunuzu bilmeyi gerektirir. Oturum açmadan M8'in PR ve CI kontrolleri çalışmaz.</p><p><strong>Beklenen çıktı:</strong> Son satırlarda <code>Logged in as &lt;kullanıcı-adınız&gt;</code> benzeri bir onay.</p><details><summary>Hata verirse</summary><ul><li><strong><code>gh: command not found</code></strong> Önceki kurulum komutunu çalıştırıp yeni terminal açın.</li><li><strong>Tarayıcı açılmadı</strong> Terminaldeki adresi elle tarayıcıya yapıştırın ve kodu girin.</li><li><strong>Kurumsal hesap, organizasyon onayı isteniyor</strong> Organizasyonun SSO onayı gerekebilir; ekip liderinizden yardım isteyin. Kişisel hesabınızı kullanmak en kolay yoldur.</li></ul></details></div>
+<pre><code>gh auth status</code></pre>
+<div class="explain"><p><strong>Ne yapar?</strong> Oturumun açık olup olmadığını ve hangi hesabın kullanıldığını gösterir.</p><p><strong>Neden?</strong> <code>gh auth login</code>'in gerçekten başarılı olduğunu görmek için.</p><p><strong>Beklenen çıktı:</strong> <code>Logged in to github.com account &lt;kullanıcı-adınız&gt;</code>.</p><details><summary>Hata verirse</summary><ul><li><strong><code>You are not logged into any GitHub hosts</code></strong> Oturum açık değil; <code>gh auth login</code> komutunu tekrarlayın.</li></ul></details></div>
+  <ul>
+    <li>Kendi kopya reponuzda <strong>GitHub Actions etkin</strong> olmalı: repo sayfasında <em>Actions</em> sekmesini açın; workflow'lar devre dışıysa etkinleştirin. M8'deki CI buna bağlıdır.</li>
+  </ul>
+
+  <ul class="check">
+    <li><label><input type="checkbox"><span>Python (Windows'ta 3.12, macOS/Linux'ta 3.11 veya üzeri) ve git kurulu</span></label></li>
+    <li><label><input type="checkbox"><span>Bob IDE kurulu ve giriş yapılmış; GitHub oturumu açık</span></label></li>
+    <li><label><input type="checkbox"><span>Bob Shell kurulu: <code>bob --version</code> çalışıyor</span></label></li>
+    <li><label><input type="checkbox"><span><code>BOB_API_KEY</code> tanımlı (scope: Inference)</span></label></li>
+    <li><label><input type="checkbox"><span><code>gh auth login</code> tamam; GitHub Actions etkin</span></label></li>
+    <li><label><input type="checkbox"><span>M5 için: DevSecOps lisansınız varsa Findings paneli çalışır, yoksa <code>scan.py</code> aynı bulguları gösterir</span></label></li>
+    <li><label><input type="checkbox"><span>M7 için: <code>bob.ibm.com/admin</code> yetkiniz yoksa ekip lideri ekranını paylaşır</span></label></li>
+  </ul>
+</section>
+
+<!-- ======================= GÖREV 0 ======================= -->
+<section id="m0" class="mission">
+  <span class="level">Görev 0</span>
+  <h2>Onboarding ve ortam kurulumu</h2>
+  <div class="meta"><span class="tag">20 dk</span><span class="tag">Bob özelliği: mode seçici, @ context</span></div>
+
+  <div class="msg">
+    <div class="avatar">EL</div>
+    <div class="bubble">
+      <div class="who">Ekip Lideri</div>
+      <p>Hoş geldin! Önce ortamını hazırlayalım: Instant Pay ekibinin reposundan <strong>kendi hesabında</strong> bir kopya aç, klonla, kurulumu çalıştır.</p>
+      <p>Sonra servisi ayağa kaldırıp ne yaptığına bak ve Bob'a "bu proje ne?" diye sor. <strong>Aynı soruyu iki farklı modda</strong> sor, farkı not al. Bob <code>services/core</code> içinde kaç endpoint olduğunu söylerse kodda kendin say. Bob'a güveniriz ama doğrularız.</p>
+    </div>
+  </div>
+
+  <div class="steps">
+    <h3>Adım 1 · Ön koşul kontrolü</h3>
+    <p>Aşağıdaki dört komutun hata vermeden çalıştığından emin olun. Her biri ayrı bir kutudadır.</p>
+<pre><code>{py} --version</code></pre>
+<pre><code>git --version</code></pre>
+<pre><code>bob --version</code></pre>
+    <div class="on-unix"><pre><code>echo "${BOB_API_KEY:+BOB_API_KEY tanımlı}"</code></pre></div>
+    <div class="on-win"><pre><code>if ($env:BOB_API_KEY) { "BOB_API_KEY tanımlı" }</code></pre></div>
+<div class="explain"><p><strong>Ne yapar?</strong> Dört kısa kontrol: Python, git ve Bob Shell'in sürümünü yazdırır; <code>BOB_API_KEY</code>'in tanımlı olup olmadığını yalnızca &quot;tanımlı&quot; yazarak gösterir (anahtarın kendisini ekrana basmaz).</p><p><strong>Neden?</strong> Programın ortasında &quot;komut bulunamadı&quot; ile vakit kaybetmemek için. Sonraki tüm adımlar bu dört şeye dayanır.</p><p><strong>Beklenen çıktı:</strong> Üç sürüm satırı (ör. <code>Python 3.12.x</code>, <code>git version 2.x</code>, Bob sürümü) ve bir <code>BOB_API_KEY tanımlı</code> satırı.</p><details><summary>Hata verirse</summary><ul><li><strong><code>BOB_API_KEY tanımlı</code> satırı hiç çıkmadı</strong> Anahtar bu terminalde tanımlı değil. <a href="#onkosul">Ön koşullar</a> 5. adımı uygulayın ve yeni terminalde yeniden deneyin.</li><li><strong>Bir komut bulunamadı</strong> İlgili <a href="#onkosul">Ön koşullar</a> adımını uygulayın ve kurulumdan sonra <strong>yeni bir terminal</strong> açın.</li></ul></details></div>
+    <p>Eksik bir şey varsa <a href="#onkosul">Ön koşullar</a> bölümüne dönün.</p>
+
+    <h3>Adım 2 · Kendi kopyanı oluştur ve klonla</h3>
+    <ol>
+      <li>GitHub'da ekibin Instant Pay repo sayfasında <strong>Use this template → Create a new repository</strong> ile <strong>kendi hesabınızda</strong> bir kopya oluşturun.</li>
+      <li>Bob IDE'de komut paletini açıp (<code>Ctrl/Cmd + Shift + P</code>) <strong>Git: Clone</strong> yazın, <strong>Clone Git Repository</strong> → <strong>Clone from GitHub</strong> (veya <em>Clone from URL</em>) seçin, kendi kopyanızı seçin ve klasörü belirleyin.</li>
+      <li>Klasör açılırken <strong>"Yes, I trust the authors"</strong> (Trust) seçeneğini onaylayın. Onaylamazsanız Restricted Mode açık kalır ve Bob'un araçları kısıtlanır.</li>
+    </ol>
+    <div class="box warn"><strong>Boş klasör açmayın, doğrudan klonlayın</strong>Boş bir klasör açıp içine dosya kopyalamak yerine repoyu klonlayın; aksi hâlde <code>origin</code> olmaz ve M8'de takılırsınız. Klonladığınız repo ekibin ana reposu değil, <em>sizin hesabınızdaki</em> kopya olmalı.</div>
+    <p>Komut satırını tercih ederseniz:</p>
+<pre><code>git clone https://github.com/&lt;kullanici-adin&gt;/&lt;repo-adi&gt;.git</code></pre>
+<div class="explain"><p><strong>Ne yapar?</strong> Reponuzu GitHub'dan bilgisayarınıza indirir. <code>&lt;kullanici-adin&gt;</code> ve <code>&lt;repo-adi&gt;</code> yerine <em>kendi</em> kopyanızın adını yazın (GitHub'da yeşil <em>Code</em> düğmesinden adresi kopyalayabilirsiniz). Komut, bulunduğunuz klasörün içinde repo adıyla yeni bir klasör açar.</p><p><strong>Neden?</strong> Çalışacağınız kod ve git geçmişi bu klonla gelir. Klon ekibin ana reposunun değil <strong>sizin hesabınızdaki</strong> kopyanın olmalı; M8'de push'u ancak böyle yapabilirsiniz.</p><p><strong>Beklenen çıktı:</strong> <code>Cloning into '&lt;repo-adi&gt;'...</code> ve ardından yüzde ilerleyen <code>Receiving objects: 100%</code> satırları.</p><details><summary>Hata verirse</summary><ul><li><strong><code>Repository not found</code></strong> Adres yanlış. Adresi GitHub'daki <em>Code</em> düğmesinden kopyalayın ve <code>&lt; &gt;</code> işaretlerini silmeyi unutmayın. Repo özelse GitHub oturumunuz açık olmalıdır (<code>gh auth status</code>).</li><li><strong><code>Authentication failed</code> / <code>could not read Username</code></strong> GitHub oturumu yok. <code>gh auth login</code> çalıştırın ya da klonlamayı Bob IDE'den <em>Git: Clone</em> ile yapın.</li><li><strong><code>destination path ... already exists and is not an empty directory</code></strong> O isimde dolu bir klasör zaten var. Ya o klasöre girin (<code>cd</code>) ya da farklı bir adla klonlayın: <code>git clone &lt;adres&gt; yeni-ad</code>.</li><li><strong><code>git: command not found</code></strong> Git kurulu değil: <a href="#onkosul">Ön koşullar</a> 2. adım.</li></ul></details></div>
+<pre><code>cd &lt;repo-adi&gt;</code></pre>
+<div class="explain"><p><strong>Ne yapar?</strong> Terminali az önce oluşan repo klasörünün içine alır (<code>cd</code> = change directory).</p><p><strong>Neden?</strong> Sonraki bütün komutlar (<code>setup.py</code>, <code>verify/run.py</code>, <code>ui/server.py</code>) <strong>repo kökünden</strong> çalışır; dosya yollarını repo köküne göre arar.</p><p><strong>Beklenen çıktı:</strong> Ekrana bir şey yazmaz; yalnızca terminaldeki istem klasör adını gösterir. Doğru yerde olduğunuzu <code>setup.py</code> dosyasını listede görerek anlarsınız (macOS/Linux: <code>ls</code>, Windows: <code>dir</code>).</p><details><summary>Hata verirse</summary><ul><li><strong><code>No such file or directory</code> / <code>Cannot find path</code></strong> Klonladığınız klasörün bulunduğu yerde değilsiniz ya da <code>&lt;repo-adi&gt;</code> yerine gerçek adı yazmadınız. Nerede olduğunuzu görmek için macOS/Linux'ta <code>pwd</code>, Windows'ta <code>Get-Location</code> çalıştırın.</li></ul></details></div>
+    <p>Klasörü Bob IDE'de açın. Bob Shell'i her zaman klasörün <strong>içinden</strong> başlatın.</p>
+
+    <h3>Adım 3 · Kurulum</h3>
+    <p><code>setup.py</code> iki şey yapar: <code>.venv</code> adlı bir Python virtual environment (venv) oluşturup <code>requirements-dev.txt</code> içindeki paketleri kurar; <code>--scanners</code> ile de güvenlik tarayıcısı Semgrep'i ayrı bir <code>.venv-tools</code> klasörüne yükler. Repodaki kodu değiştirmez; venv'i elle etkinleştirmeniz gerekmez.</p>
+<pre><code>{py} setup.py --scanners</code></pre>
+<div class="explain"><p><strong>Ne yapar?</strong> Üç şey yapar: (1) <code>.venv</code> adlı bir Python virtual environment (venv) oluşturur, (2) <code>requirements-dev.txt</code> içindeki paketleri (FastAPI, pytest vb.) bu ortama kurar, (3) <code>--scanners</code> sayesinde güvenlik tarayıcısı Semgrep'i ayrı bir <code>.venv-tools</code> klasörüne yükler. Repodaki kodu değiştirmez.</p><p><strong>Neden?</strong> Herkesin aynı Python sürümü ve aynı paketlerle çalışması için. Doğrulayıcı, testler ve arayüz bu ortamı kullanır; venv'i elle etkinleştirmeniz gerekmez.</p><p><strong>Beklenen çıktı:</strong> Önce gereksinim kontrolü, sonra <code>[tamam]</code> ile biten adımlar ve en sonda <code>Kurulum tamam. Şimdi doğrulayın:</code>. <strong>2–5 dakika</strong> sürebilir; bir süre ekrana bir şey yazılmıyorsa pip indiriyordur, bekleyin.</p><details><summary>Hata verirse</summary><ul><li><strong><code>Python 3.11+ gerekli</code></strong> Python sürümünüz eski. <a href="#onkosul">Ön koşullar</a> 1. adımla güncelleyin, sonra komutu tekrarlayın.</li><li><strong>Linux: <code>venv</code> / <code>ensurepip</code> bileşeni eksik</strong> Şunu çalıştırıp kurulumu tekrarlayın:<pre><code>sudo apt install python3-venv python3-pip</code></pre></li><li><strong><code>Connection timed out</code> / <code>SSL</code> / <code>Could not find a version</code></strong> Ağ ya da kurumsal proxy sorunu. Başka bir ağı veya VPN ayarını deneyin; komutu yeniden çalıştırmak güvenlidir, var olan ortamı yeniden kullanır.</li><li><strong><code>Cache entry deserialization failed</code> (pip uyarısı)</strong> Zararsızdır; kurulum devam ediyorsa yok sayın.</li><li><strong>Kurulum yarıda kesildi, tuhaf hatalar var</strong> <code>.venv</code> klasörünü silip komutu yeniden çalıştırın; sıfırdan kurar.</li><li><strong>Windows: Semgrep uyarısı</strong> Beklenen bir durumdur; aşağıdaki Windows notuna bakın. Kurulum yine de tamamlanır.</li></ul></details></div>
+    <div class="box"><strong>Windows notu</strong>Semgrep Windows'ta yerel olarak kurulamayabilir. Bu durumda kurulum uyarı verir ama durmaz; M5'teki taramayı WSL'de ya da PR'daki CI'da çalıştırabilirsiniz.</div>
+
+    <h3>Adım 4 · Doğrulama</h3>
+    <p>M0'da doğrulama kurulumdan hemen sonra gelir, çünkü sonraki görevlerin hepsi buna dayanır. Sonucu doğrulamak için aşağıdaki komutu kullanabilirsiniz:</p>
+<pre><code>{py} verify/run.py m0</code></pre>
+<div class="explain"><p><strong>Ne yapar?</strong> Yedi kontrol çalıştırır: (1) Python 3.11+, (2) paketler kurulu, (3) Aurora Core uygulaması ayağa kalkıp <code>/health</code>'e cevap veriyor, (4) görev dosyaları yerinde, (5) git kurulu ve klasör bir git deposu, (6) Semgrep kurulu, (7) Bob Shell (<code>bob</code>) kurulu.</p><p><strong>Neden?</strong> Sonraki sekiz görev bu kurulumun üstüne kurulu. Şimdi doğrulamak, M5'te ya da M8'de sürpriz çıkmasını önler.</p><p><strong>Beklenen çıktı:</strong> Yedi <code>[PASS]</code> satırı ve <code>M0 Kurulum: PASS  7/7 kontrol</code>.</p><details><summary>Hata verirse</summary><ul><li><strong><code>Bagimliliklar kurulu</code> FAIL</strong> <code>setup.py</code> hiç çalışmamış ya da yarım kalmış. Yukarıdaki kurulum komutunu tekrarlayın.</li><li><strong><code>Aurora Core uygulamasi ayaga kalkiyor</code> FAIL</strong> Çoğunlukla paket eksiğidir: kurulumu tekrarlayın. Sürerse ekrandaki hata mesajını ekip liderine gösterin; <code>services/core</code> dosyalarını değiştirmediğinizden emin olun.</li><li><strong><code>Git kurulu ve klasor bir git deposu</code> FAIL</strong> Repoyu ZIP olarak indirip açtıysanız <code>.git</code> klasörü yoktur. <code>git clone</code> ile yeniden alın.</li><li><strong><code>semgrep kurulu</code> FAIL</strong> <code>--scanners</code> bayrağı olmadan kurmuş olabilirsiniz: <code>{py} setup.py --scanners</code>. Windows'ta Semgrep kurulamayabilir; bu M5'te WSL ya da CI ile çözülür.</li><li><strong><code>Bob Shell</code> FAIL</strong> <code>bob</code> terminalin PATH'inde değil: <a href="#onkosul">Ön koşullar</a> 4. adım ve yeni terminal.</li></ul></details></div>
+
+    <h3>Adım 5 · Servisi ayağa kaldır ve tanı</h3>
+    <p>Aurora Pay'in tarayıcı arayüzünü başlatın. Bu ekran, ilerleyen görevlerde Bob'un yaptığı değişiklikleri gözlemleyeceğiniz yerdir.</p>
+<pre><code>{py} ui/server.py</code></pre>
+<div class="explain"><p><strong>Ne yapar?</strong> Aurora Pay'in küçük web arayüzünü başlatır. Arka planda Aurora Core servisini 8000 portunda, arayüzü 8080 portunda çalıştırır. Komut çalıştığı sürece terminali <strong>meşgul eder</strong>; bu normaldir, komut istemi geri gelmez.</p><p><strong>Neden?</strong> Sonraki görevlerde Bob'un kodda yaptığı değişiklikleri tarayıcıda gözlemlemek için; Bob'un söylediğiyle gerçekte olanı karşılaştırırsınız.</p><p><strong>Beklenen çıktı:</strong> <code>Aurora Pay arayüzü: http://127.0.0.1:8080   (durdurmak için Ctrl+C)</code> ve ilk açılışta <code>[ui] core servisi başlatılıyor (port 8000)</code>. Adresi tarayıcıda açınca arayüz görünür.</p><details><summary>Hata verirse</summary><ul><li><strong><code>Port 8080 dolu: arayüz zaten çalışıyor olabilir</code></strong> Daha önce başlattığınız arayüz hâlâ açık. Adresi tarayıcıda açın; yeniden başlatmak isterseniz eski sunucunun terminalinde <code>Ctrl+C</code> yapın. Terminali bulamıyorsanız macOS/Linux'ta <code>lsof -i :8080</code> ile süreci bulup <code>kill &lt;PID&gt;</code>, Windows'ta <code>netstat -ano | findstr :8080</code> ile bulup <code>taskkill /PID &lt;PID&gt; /F</code> çalıştırın.</li><li><strong><code>ModuleNotFoundError</code> / uvicorn bulunamadı</strong> Paketler kurulu değil: <code>{py} setup.py</code>.</li><li><strong>Tarayıcıda sayfa açılmıyor</strong> Terminaldeki komutun hâlâ çalıştığına bakın. Adresi tam olarak <code>http://127.0.0.1:8080</code> yazın. Arayüz açık ama içi boşsa 8000 portunu başka bir program kullanıyor olabilir; onu kapatıp sunucuyu yeniden başlatın.</li><li><strong>Durdurmak istiyorum</strong> Çalıştığı terminalde <code>Ctrl+C</code>.</li></ul></details></div>
+    <p>Tarayıcıda <a href="http://127.0.0.1:8080">http://127.0.0.1:8080</a> adresini açın, sonra:</p>
+    <ol>
+      <li><em>Hesaplar ve transfer</em> sekmesinde <strong>Demo hesapları ekle (A ve B)</strong> düğmesine basın.</li>
+      <li>A'dan B'ye bir transfer gönderin; bakiyelerin değiştiğini görün.</li>
+      <li>Sorulara bakın: bu servis ne yapıyor, hangi dosyalar neyi yönetiyor?</li>
+    </ol>
+    <p>Sunucuyu <code>Ctrl+C</code> ile durdurabilirsiniz. Servis kod değişince kendini yeniler; Bob bir şeyi düzelttiğinde sayfadaki <em>Değişiklik kontrolü</em> sekmesinden sonucu görürsünüz.</p>
+
+    <h3>Adım 6 · Bob'a sor</h3>
+    <p>Yeni bir terminalde (arayüz çalışmaya devam etsin) ya da IDE'deki sohbette, projeyi <strong>kendi cümlelerinizle</strong> anlattırın ve <code>docs/</code> ile karşılaştırın. Sonra aynı soruyu başka bir modda tekrarlayın. Ardından Bob'a <code>services/core</code>'u açıklatın.</p>
+    <p>Bob endpoint sayısını söylediğinde kodda kendiniz sayın. Endpointler <code>@app.</code> dekoratörleriyle tanımlıdır:</p>
+    <div class="on-unix"><pre><code>grep -c "@app\." services/core/main.py</code></pre></div>
+    <div class="on-win"><pre><code>(Select-String -Path services/core/main.py -Pattern "@app\.").Count</code></pre></div>
+<div class="explain"><p><strong>Ne yapar?</strong> Dosyada <code>@app.</code> geçen satırları sayar. Her endpoint bir <code>@app.get</code>, <code>@app.post</code> gibi dekoratörle tanımlandığı için bu sayı endpoint sayısıdır. macOS/Linux'ta <code>grep -c</code> (count), Windows'ta <code>Select-String</code> aynı işi yapar.</p><p><strong>Neden?</strong> Bob'un söylediğini doğrulamak için. Büyük dil modelleri sayıyı tahmin edebilir; kodda sayarak &quot;Bob'a güveniriz ama doğrularız&quot; ilkesini uygulamış olursunuz.</p><p><strong>Beklenen çıktı:</strong> Tek bir sayı: <code>7</code>.</p><details><summary>Hata verirse</summary><ul><li><strong><code>0</code> yazdı ya da <code>No such file or directory</code> / <code>Cannot find path</code></strong> Repo kökünde değilsiniz; dosya yolu <code>services/core/main.py</code> repo köküne göre yazılmıştır. <code>cd &lt;repo-adi&gt;</code> yapıp tekrar deneyin.</li><li><strong><code>7</code>'den farklı bir sayı</strong> <code>services/core</code> dosyasını değiştirmiş olabilirsiniz. Değişiklikleri <code>git diff services/core</code> ile görün.</li></ul></details></div>
+    <div class="box"><strong>Bulgu: Bob satır sayısını tahmin edebilir</strong>Bob'a "kaç satır" diye sorarsanız tahmin yürütebilir; satırları kendiniz sayın:</div>
+    <div class="on-unix"><pre><code>wc -l services/core/*.py</code></pre></div>
+    <div class="on-win"><pre><code>Get-ChildItem services/core/*.py | ForEach-Object { "{0} {1}" -f (Get-Content $_).Count, $_.Name }</code></pre></div>
+<div class="explain"><p><strong>Ne yapar?</strong> <code>services/core</code> içindeki Python dosyalarının satır sayısını yazar. macOS/Linux'ta <code>wc -l</code> (word count, lines) her dosya için ve en sonda toplam verir; Windows komutu dosya başına bir satır verir.</p><p><strong>Neden?</strong> Bob &quot;kaç satır&quot; diye sorulunca sayıyı tahmin yürüterek söyleyebilir. Kendi sayınızla karşılaştırarak Bob'un hangi tür sorularda doğrulanması gerektiğini görürsünüz.</p><p><strong>Beklenen çıktı:</strong> Her satırda satır sayısı ve dosya adı, ör. <code>120 services/core/main.py</code>. macOS/Linux'ta son satır <code>total</code>'dır.</p><details><summary>Hata verirse</summary><ul><li><strong><code>No such file or directory</code> / <code>Cannot find path</code></strong> Repo kökünde değilsiniz: <code>cd &lt;repo-adi&gt;</code>.</li></ul></details></div>
+
+    <h3>Adım 7 · Çalışma branch'ini açın</h3>
+    <p>Görev 8'deki teslimat için şimdiden kendi branch'inizi açın. <code>&lt;kısa-ad&gt;</code> yerine kendi kısa adınızı yazın:</p>
+<pre><code>git switch -c feature/&lt;kısa-ad&gt;</code></pre>
+<div class="explain"><p><strong>Ne yapar?</strong> Yeni bir dal (branch) açar ve hemen ona geçer. <code>&lt;kısa-ad&gt;</code> yerine boşluk içermeyen kısa bir ad yazın (ör. <code>feature/ayse</code>).</p><p><strong>Neden?</strong> <code>main</code> branch'ine dokunmadan çalışmak için. M8'deki Pull Request bu daldan açılır.</p><p><strong>Beklenen çıktı:</strong> <code>Switched to a new branch 'feature/...'</code>.</p><details><summary>Hata verirse</summary><ul><li><strong><code>a branch named ... already exists</code></strong> Branch zaten var; yeniden açmayın, geçin: <pre><code>git switch feature/&lt;kısa-ad&gt;</code></pre></li><li><strong><code>fatal: not a git repository</code></strong> Repo klasöründe değilsiniz (<code>cd &lt;repo-adi&gt;</code>) ya da repoyu ZIP olarak indirdiniz; <code>git clone</code> ile yeniden alın.</li><li><strong><code>'switch' is not a git command</code></strong> Git eski (2.23 öncesi). Eşdeğeri:<pre><code>git checkout -b feature/&lt;kısa-ad&gt;</code></pre></li><li><strong><code>invalid reference</code> / <code>not a valid branch name</code></strong> Branch adında boşluk ya da özel karakter olmasın; <code>feature/ayse</code> gibi yazın.</li></ul></details></div>
+    <div class="box"><strong>Bulgu: her görev bitince bir commit atın</strong>Branch'i şimdi açıyoruz, çünkü bundan sonra her görevin sonunda bir commit atacaksınız. Her görevin <em>Teslim edilecekler</em> listesinde bu bir madde olarak yer alır. Görev 8'de en az 3 anlamlı commit istenir. Commit örneği:</div>
+<pre><code>git add -A</code></pre>
+<pre><code>git commit -m "Add limits service from PRD"</code></pre>
+<div class="explain"><p><strong>Ne yapar?</strong> İki komuttur. <code>git add -A</code> working tree'deki tüm değişiklikleri (yeni, değişen, silinen dosyalar) bir sonraki kayda hazırlar. <code>git commit -m</code> hazırlananları mesajınızla kalıcı bir kayıt (commit) olarak saklar. Burası yalnızca örnektir: M0'da commit edecek bir şey yoktur; M1'den itibaren her görev sonunda kullanacaksınız.</p><p><strong>Neden?</strong> M8'de en az 3 anlamlı commit istenir. Görev başına bir commit, PR'ı okuyan kişinin işin hikâyesini görmesini sağlar.</p><p><strong>Beklenen çıktı:</strong> <code>[feature/... abc1234] Add limits service from PRD</code> ve altında <code>N files changed</code> benzeri bir özet.</p><details><summary>Hata verirse</summary><ul><li><strong><code>Author identity unknown</code> / <code>Please tell me who you are</code></strong> Git, commit'i kimin attığını bilmiyor. Bir kez şunları çalıştırın (kendi adınızı ve e-postanızı yazın), sonra commit'i tekrarlayın:<pre><code>git config --global user.name "Adınız Soyadınız"</code></pre><pre><code>git config --global user.email "eposta@ornek.com"</code></pre></li><li><strong><code>nothing to commit, working tree clean</code></strong> Kaydedilecek değişiklik yok. M0'da beklenen budur.</li><li><strong>Bir metin editörü (vim) açıldı, çıkamıyorum</strong> <code>-m</code> ile mesaj vermemişsiniz. <code>Esc</code>'e basıp <code>:q!</code> yazın, Enter'a basın; sonra komutu mesajla tekrarlayın.</li><li><strong>Beklemediğim dosyalar commit'e girdi</strong> <code>git status --short</code> ile bakın; <code>.venv</code>, <code>reports/bob-run.json</code> gibi dosyalar zaten yok sayılır, başka bir dosya ise <code>git restore --staged &lt;dosya&gt;</code> ile çıkarın.</li></ul></details></div>
+  </div>
+
+  <div class="deliver">
+    <h3>Teslim edilecekler</h3>
+    <ul class="check">
+      <li><label><input type="checkbox"><span>Kendi GitHub hesabımdaki kopya klonlandı; kurulum tamamlandı</span></label></li>
+      <li><label><input type="checkbox"><span><code>verify m0</code> tüm kontrollerde <strong>PASS</strong></span></label></li>
+      <li><label><input type="checkbox"><span>Servis arayüzde çalışıyor; demo hesapları oluşturup bir transfer denedim</span></label></li>
+      <li><label><input type="checkbox"><span>Endpoint sayısını Bob'un söylediğiyle kodda karşılaştırdım (beklenen: <strong>7</strong>)</span></label></li>
+      <li><label><input type="checkbox"><span><code>feature/&lt;kısa-ad&gt;</code> branch'ini açtım</span></label></li>
+    </ul>
+  </div>
+
+  <div class="status"></div>
+</section>
+
+<!-- ======================= GÖREV 1 ======================= -->
+<section id="m1" class="mission">
+  <span class="level">Görev 1</span>
+  <h2>Limit servisi geliştirme</h2>
+  <div class="meta"><span class="tag">25 dk</span><span class="tag">Bob özelliği: Plan / Agent, todo list</span><span class="tag plain">Doğrulama: 35 kontrol</span></div>
+
+  <div class="msg">
+    <div class="avatar gold">ÜS</div>
+    <div class="bubble">
+      <div class="who">Ürün Sahibi · Instant Pay</div>
+      <p>BDDK uyumu için canlıya çıkmadan önce her müşteri için <strong>günlük ve işlem başına transfer limiti</strong> uygulayacağız, ayrıca müşteri <strong>işlem dökümünü</strong> (statement) alabilecek.</p>
+      <p>Henüz <strong>tek satır kod yok</strong>. Elinizde iki doküman var: <code>docs/PRD-limits.md</code> (iş kuralları, örnek senaryo) ve <code>docs/API-SPEC-limits.yaml</code> (endpointler). Küçük, bağımsız bir servis istiyoruz. Bellek içi depolama yeter.</p>
+    </div>
+  </div>
+
+  <div class="steps">
+    <h3>Adım 1 · Önce anla (Plan mode)</h3>
+    <div class="box"><strong>Bulgu: bu görevde yeni bir servis yazıyorsunuz</strong><code>services/limits</code>, <code>services/core</code>'dan bağımsız <strong>yeni</strong> bir servistir. Core'a dokunmayın, onu import etmeyin.</div>
+    <p>PRD ve API sözleşmesini Bob'a <strong>bağlam olarak</strong> verin (<code>@docs/PRD-limits.md</code>), yapıştırmayın. Bob'dan bir <strong>uygulama planı</strong> isteyin ve açıkça yazın: <em>"Ben onaylayana kadar kod yazma."</em></p>
+    <p>Planı okurken PRD bölüm 4'ü (10 madde) yanınızda açın ve her maddeyi plana karşı işaretleyin. <strong>Plan on kuralın hepsini kapsıyor mu?</strong> Kapsamayan varsa kodlamadan önce Bob'a ekletin. Eksik plan, eksik kod demektir.</p>
+    <p>Bob Plan mode'da size soru soracaktır. Beklenen sorular ve örnek cevaplar:</p>
+    <table>
+      <thead><tr><th>Bob'un sorusu</th><th>Örnek cevap</th></tr></thead>
+      <tbody>
+        <tr><td>Test coverage hedefi nedir?</td><td>%85 coverageı koruyalım.</td></tr>
+        <tr><td><code>customer_id</code> nerede doğrulanmalı?</td><td>Yalnızca HTTP katmanında doğrulayalım.</td></tr>
+        <tr><td><code>from</code> Python'da ayrılmış sözcük; JSON'daki <code>from</code> alanı nasıl karşılanmalı?</td><td>Alias yaklaşımını kullanalım (alan adı farklı, JSON anahtarı <code>from</code>).</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Adım 2 · Sonra yaz (Agent mode)</h3>
+    <p>Onayladığınız planı uygulatın. Todo list'i izleyin: Bob işi parçalara bölüyor mu, siz kontrol edebiliyor musunuz? Servisi arayüzde görmek için M0'daki arayüzü çalıştırın; <code>services/limits/main.py</code> oluşunca <em>Limitler</em> sekmesi çalışır.</p>
+<pre><code>{py} ui/server.py</code></pre>
+<div class="explain"><p><strong>Ne yapar?</strong> M0'daki arayüzü başlatır. <code>services/limits/main.py</code> oluşur oluşmaz arayüz limits servisini de kendiliğinden 8001 portunda başlatır; sunucuyu yeniden başlatmanız gerekmez.</p><p><strong>Neden?</strong> Bob'un yazdığı servisi tarayıcıdan denemek, doğrulayıcıyı çalıştırmadan önce davranışı gözle görmek için.</p><p><strong>Beklenen çıktı:</strong> M0'daki satırlar. Limits dosyası oluştuktan birkaç saniye sonra konsolda <code>[ui] limits servisi başlatılıyor (port 8001)</code> görünür ve <em>Limitler</em> sekmesi çalışır.</p><details><summary>Hata verirse</summary><ul><li><strong><code>Port 8080 dolu</code></strong> M0'daki arayüz hâlâ açık; aynı sunucuyu kullanmaya devam edin, yeniden başlatmanıza gerek yok.</li><li><strong><em>Limitler</em> sekmesi bağlanamıyor (<code>limits servisi çalışmıyor</code>)</strong> <code>services/limits/main.py</code> henüz yok ya da içinde bir söz dizimi hatası var. Terminaldeki hata satırlarını Bob'a verin. Dosyada <code>app = FastAPI()</code> bulunmalıdır.</li><li><strong>Sunucuyu kapatıp yeniden açtım, hâlâ çalışmıyor</strong> 8001 portunu başka bir program kullanıyor olabilir; onu kapatıp sunucuyu yeniden başlatın.</li></ul></details></div>
+
+    <h3>Adım 3 · Doğrulama</h3>
+    <p>Sonucu doğrulamak için aşağıdaki komutu kullanabilirsiniz:</p>
+<pre><code>{py} verify/run.py m1</code></pre>
+<div class="explain"><p><strong>Ne yapar?</strong> PRD ve API şartnamesindeki limit kurallarını 35 otomatik kontrolle sınar: varsayılan limitler, limit yazma ve okuma, geçersiz girdilerde 422, para biçimi ve hata biçimi gibi.</p><p><strong>Neden?</strong> Bob'un PRD'yi doğru koda çevirdiğinin kanıtı budur; &quot;çalışıyor gibi görünüyor&quot; yetmez.</p><p><strong>Beklenen çıktı:</strong> Servis yokken tüm kontroller hata verir ve çıktıda <code>No module named 'services.limits'</code> gibi satırlar görünür. Servis yazıldıkça kontroller <code>PASS</code> olur; hedef <code>M1 ...: PASS  35/35</code>.</p><details><summary>Hata verirse</summary><ul><li><strong><code>No module named 'services.limits'</code></strong> <code>services/limits/main.py</code> henüz oluşmamış ya da yanlış konumda.</li><li><strong><code>icinde 'app' bulunamadi</code></strong> Dosyada <code>app</code> adlı FastAPI nesnesi tanımlı değil.</li><li><strong>Bazı kontroller <code>[FAIL]</code></strong> <code>-&gt;</code> satırı hangi kuralın eksik olduğunu söyler. Bu satırı olduğu gibi Bob'a verip düzelttirin. İlk seferde bütün kontrollerin geçmemesi normaldir.</li></ul></details></div>
+    <p>FAIL satırının altındaki açıklama PRD'deki hangi kuralı kaçırdığınızı söyler; düzeltmeyi o cümleye dayandırın. <strong>Bob'un yazdığı kodun ilk seferde tüm kontrollerden geçmemesi normaldir.</strong> Hataları doğrulama çıktısıyla Bob'a geri verip düzelttirmek işin parçasıdır.</p>
+  </div>
+
+  <div class="deliver">
+    <h3>Teslim edilecekler</h3>
+    <ul class="check">
+      <li><label><input type="checkbox"><span><code>services/limits/main.py</code> içinde <code>app</code> adlı bir <strong>FastAPI</strong> uygulaması</span></label></li>
+      <li><label><input type="checkbox"><span><code>verify m1</code>: <strong>35 kontrolün tamamı</strong> PASS</span></label></li>
+      <li><label><input type="checkbox"><span>Yeni dependency eklenmedi, <code>services/core</code>'a dokunulmadı</span></label></li>
+    </ul>
+  </div>
+
+  <div class="status"></div>
+</section>
+
+<!-- ======================= GÖREV 2 ======================= -->
+<section id="m2" class="mission">
+  <span class="level">Görev 2</span>
+  <h2>SEV-2 alarmı</h2>
+  <div class="meta"><span class="tag">20 dk</span><span class="tag">Bob özelliği: Bob Shell (bob chat, bob run)</span><span class="tag plain">Doğrulama: 24 kontrol</span></div>
+
+  <div class="msg">
+    <div class="avatar red">!</div>
+    <div class="bubble">
+      <div class="who">Olay Kanalı · INCIDENT-2041 · SEV-2</div>
+      <p><strong>Ne oldu?</strong> Canlı sistemde para transferleri yanlış çalışıyor ve müşteriler fark etti. <strong>SEV-2</strong> "ciddi olay" demektir: çok sayıda müşteriyi etkiliyor ve bugün çözülmesi gerekiyor. Bu sabah üç ekipten dört şikâyet geldi, hepsi para transferi (<code>POST /transfers</code>) ile ilgili:</p>
+      <ol>
+        <li><strong>Müşteri Deneyimi:</strong> <em>"Müşterilerin parası <strong>iki kez</strong> düşüyor."</em> Mobil uygulama, zaman aşımına uğrayan isteği aynı <code>Idempotency-Key</code> ile tekrar gönderiyor ve tutar iki kez çekiliyor.</li>
+        <li><strong>Müşteri Deneyimi:</strong> <em>"Yanlış hesap yazan müşterinin parası düşüyor ama alıcıya gitmiyor."</em> Ekranda "Internal Server Error" görünüyor.</li>
+        <li><strong>Mutabakat:</strong> <em>"Bakiyeler kuruş altı farklarla tutmuyor (<code>99.00000000000006</code>) ve bazı ücretler politikadan 1 kuruş düşük."</em></li>
+        <li><strong>Mobil ekip:</strong> <em>"Yetersiz bakiyede, negatif tutarda ve bilinmeyen hesapta düzgün hata gelmiyor, sunucu 500 dönüyor."</em></li>
+      </ol>
+    </div>
+  </div>
+  <div class="msg">
+    <div class="avatar">EL</div>
+    <div class="bubble">
+      <div class="who">Ekip Lideri</div>
+      <p>Bu olay <strong>sana atandı</strong>. Acele var ama <strong>yeni bir regression istemiyoruz</strong>; yani düzeltirken daha önce çalışan hiçbir şeyi bozma. Bu işi IDE'de değil, <strong>terminalde Bob Shell</strong> ile yürüt. Önce her şikâyetin root cause'unu (sorunun asıl kaynağı) bul, sonra düzelt.</p>
+      <p>Dosyalar: <code>docs/INCIDENT-2041.md</code>, <code>fixtures/incident/transfer.log</code>, <code>fixtures/incident/repro.py</code>, <code>docs/FEE-POLICY.md</code>, <code>docs/ENGINEERING-HANDBOOK.md</code> (bölüm 1-2).</p>
+    </div>
+  </div>
+
+  <div class="steps">
+    <h3>Adım 1 · Bob'a olayı inceletin ve root cause'ları buldurun (düzeltme yasak)</h3>
+    <p><strong>Bu adımın görevi:</strong> Bob'a olay kaydını ve logu gösterin, dört şikâyetin her biri için root cause'u bulmasını isteyin. <strong>Bob'un hiçbir dosyayı değiştirmesini açıkça yasaklayın.</strong> Örnek istem: <em>"docs/INCIDENT-2041.md ve fixtures/incident/transfer.log dosyalarını oku. Dört şikâyetin her biri için root cause'u bul ve açıkla. Hiçbir dosyayı değiştirme, düzeltme yazma."</em></p>
+    <div class="box"><strong>Bulgu: dört şikâyet aynı nedene bağlı değil</strong>Şikâyetler birbirine benziyor ama dört ayrı root cause var. Bob'un hepsini tek bir nedenle açıklamaya çalıştığını görürseniz durdurup şikâyetleri tek tek ele aldırın.</div>
+    <p><strong>İki pencere, iki iş.</strong> Biri Bob için, biri sizin kontrolleriniz için. Terminal 1'de repo kökünden Bob Shell'i başlatın:</p>
+<pre><code>bob chat</code></pre>
+<div class="explain"><p><strong>Ne yapar?</strong> Bob Shell'i <strong>etkileşimli sohbet</strong> (interactive chat) modunda başlatır: terminal, Bob'la konuşabildiğiniz bir pencereye dönüşür. Bob, başlatıldığı klasördeki dosyaları görür; bu yüzden repo kökünde çalıştırın.</p><p><strong>Neden?</strong> Teşhis aşamasında Bob'la soru-cevap yaparak root cause'ları bulmak için. Burada düzeltmeyi bilerek yasaklıyorsunuz; amaç önce anlamak.</p><p><strong>Beklenen çıktı:</strong> Bir karşılama ekranı ve mesaj yazabileceğiniz bir istem. Bundan sonra yazdıklarınız Bob'a gider.</p><details><summary>Hata verirse</summary><ul><li><strong><code>bob: command not found</code></strong> Bob Shell kurulu değil ya da yeni terminal açmadınız: <a href="#onkosul">Ön koşullar</a> 4. adım.</li><li><strong>Kimlik / API anahtarı hatası, <code>401</code></strong> Aşağıdaki sarı kutudaki gibi bu terminalde <code>BOB_API_KEY</code>'i tanımlayıp <code>bob chat</code>'i yeniden başlatın. Anahtarın scope'u <strong>Inference</strong> olmalıdır.</li><li><strong>Bob dosyaları göremiyor / yanlış klasörü anlatıyor</strong> <code>bob chat</code>'i repo kökünden başlatmamışsınız. Kapatıp <code>cd &lt;repo-adi&gt;</code> yaptıktan sonra yeniden başlatın.</li></ul></details></div>
+    <p>Şimdi yukarıdaki isteminizi Bob'a yazın.</p>
+    <div class="box warn"><strong>API anahtarı hatası</strong><code>bob chat</code> kimlik veya API anahtarı hatası verirse <code>BOB_API_KEY</code> bu terminalde tanımlı değildir. Tanımlayıp yeniden başlatın:
+      <div class="on-unix"><pre><code>export BOB_API_KEY="&lt;anahtarınız&gt;"</code></pre></div>
+      <div class="on-win"><pre><code>$env:BOB_API_KEY="&lt;anahtarınız&gt;"</code></pre></div>
+    </div>
+    <p>Terminal 2'de olayı yeniden üretin:</p>
+<pre><code>{vpy} fixtures/incident/repro.py</code></pre>
+<div class="explain"><p><strong>Ne yapar?</strong> Olay 2041'i kendi bilgisayarınızda yeniden üretir: <code>repro.py</code> dört şikâyetin her biri için küçük bir senaryo çalıştırır ve şikâyetin hâlâ geçerli olup olmadığını yazar. <code>{vpy}</code> projenin kendi <code>.venv</code> Python'udur (<code>setup.py</code> kurdu); sistem Python'u değildir.</p><p><strong>Neden?</strong> Bob'un &quot;root cause bu&quot; dediği şeyi bir kanıtla eşleştirmek için. Düzeltmeden sonra aynı komut &quot;kapandı&quot; demelidir.</p><p><strong>Beklenen çıktı:</strong> Her şikâyet için bir <code>[FAIL] Sikayet N - ...</code> satırı ve altında <code>beklenen:</code> açıklaması; en sonda <code>INCIDENT-2041: 4 sikayet acik</code>. Düzelttikçe satırlar <code>[PASS]</code> olur ve sayı azalır.</p><details><summary>Hata verirse</summary><ul><li><strong><code>No such file or directory: .venv/bin/python</code> (Windows: <code>.venv\Scripts\python</code> bulunamadı)</strong> <code>.venv</code> oluşmamış: <code>{py} setup.py</code> çalıştırın.</li><li><strong><code>ModuleNotFoundError: No module named 'services'</code></strong> Komutu repo kökünden çalıştırın.</li><li><strong>Bob'u çalıştırdığım terminal kapandı</strong> Bu komut <strong>ikinci</strong> terminalde çalışmalıdır; Bob'un sohbeti açık kalsın.</li></ul></details></div>
+    <p>Çıkış kodunu görmek için hemen ardından:</p>
+    <div class="on-unix"><pre><code>echo $?</code></pre></div>
+    <div class="on-win"><pre><code>echo $LASTEXITCODE</code></pre></div>
+<div class="explain"><p><strong>Ne yapar?</strong> Hemen önce çalışan komutun <strong>çıkış kodunu</strong> yazar (macOS/Linux: <code>$?</code>, Windows PowerShell: <code>$LASTEXITCODE</code>). <code>0</code> başarı, sıfırdan farklı bir sayı hata demektir.</p><p><strong>Neden?</strong> <code>repro.py</code> açık şikâyet varken <code>1</code>, hepsi kapanınca <code>0</code> ile biter. CI ve otomatik kontroller yazıyı değil bu sayıyı okur.</p><p><strong>Beklenen çıktı:</strong> Şikâyetler açıkken <code>1</code>, dördü de kapanınca <code>0</code>.</p><details><summary>Hata verirse</summary><ul><li><strong>Her zaman <code>0</code> çıkıyor</strong> <code>repro.py</code>'den sonra başka bir komut çalıştırdınız; çıkış kodu en son komuta aittir. <code>repro.py</code>'yi yeniden çalıştırıp <strong>hemen ardından</strong> bu komutu yazın.</li><li><strong>Windows'ta boş satır geliyor</strong> <code>cmd</code> yerine PowerShell kullanın. <code>cmd</code>'de karşılığı <code>echo %ERRORLEVEL%</code>'dir.</li></ul></details></div>
+    <p>Bob'un bulduğu her nedeni <code>repro.py</code> çıktısıyla eşleştirin: kaç şikâyet kapandı, kaçı açık?</p>
+
+    <h3>Adım 2 · Düzelttirin (tek seferlik, fren takılı)</h3>
+    <div class="box"><strong>Kapsam: yalnızca bu 4 şikâyet</strong>Bu görevde yalnızca yukarıdaki dört şikâyeti kapatın. Bob <code>verify/</code> klasörünü okuyabilir ve Görev 4'ün gizli hatalarını da düzeltmeye kalkabilir; istemediğinizi görev tanımında açıkça söyleyin.</div>
+    <p>Aynı işi bu kez <code>bob run</code> ile, <strong>tur ve maliyet sınırı koyarak</strong> yaptırın. Sınır değerlerini ve görev tanımını kendiniz belirleyin:</p>
+<pre><code>bob run --max-turns &lt;n&gt; --max-cost &lt;bobcoin&gt; "&lt;görev tanımınız&gt;"</code></pre>
+<div class="explain"><p><strong>Ne yapar?</strong> Bob'u <strong>tek seferlik ve etkileşimsiz</strong> çalıştırır: görev tanımını siz verirsiniz, Bob bitirene ya da sınıra ulaşana kadar kendi başına çalışır. <code>--max-turns</code> Bob'un en fazla kaç tur (düşün, araç çağır, sonucu oku döngüsü) yapacağını, <code>--max-cost</code> en fazla ne kadar Bobcoin harcayacağını sınırlar. <code>&lt;n&gt;</code>, <code>&lt;bobcoin&gt;</code> ve görev tanımını siz yazarsınız; sayfanın sonundaki <em>Komutlar</em> bölümünde bir örnek var.</p><p><strong>Neden?</strong> Bu modda Bob her işlem için onay <strong>istemez</strong>. Sınırlar, yanlış anlaşılan bir görevde Bob'un kontrolsüz değişiklik yapmasını ve gereksiz maliyeti engelleyen frendir.</p><p><strong>Beklenen çıktı:</strong> Bob'un adımlarının akan bir çıktısı ve sonunda bir özet. Sınıra ulaşırsa işi yarıda bırakır; o ana kadar yaptığı değişiklikler diskte kalır, <code>git diff</code> ile görebilirsiniz.</p><details><summary>Hata verirse</summary><ul><li><strong><code>unknown option</code> / <code>unrecognized argument</code></strong> Bob Shell sürümünüzde bu seçenek adı farklı olabilir. Hemen altındaki <code>bob run --help</code> ile gerçek adlarını görün; gerekirse Bob Shell'i güncelleyin.</li><li><strong>Kimlik / API anahtarı hatası</strong> Bu terminalde <code>BOB_API_KEY</code> tanımlı değil (Adım 1'deki sarı kutu).</li><li><strong>Bob işi yarım bıraktı</strong> Sınıra ulaşmış olabilir. Görev tanımını daraltın (tek bir şikâyet, tek bir çalıştırma) ya da sınırı biraz artırıp yeniden deneyin.</li><li><strong>Bob kapsam dışındaki dosyaları değiştirdi</strong> <code>git diff --stat</code> ile hangi dosyaların değiştiğine bakın; istemediklerinizi <code>git restore &lt;dosya&gt;</code> ile geri alın. Görev tanımına &quot;yalnızca bu 4 şikâyet; <code>verify/</code> klasörüne dokunma&quot; yazın.</li></ul></details></div>
+    <p>Tüm seçenekler için:</p>
+<pre><code>bob run --help</code></pre>
+<div class="explain"><p><strong>Ne yapar?</strong> <code>bob run</code> için kullanılabilir tüm seçenekleri ve kısa açıklamalarını listeler.</p><p><strong>Neden?</strong> Sınır seçeneklerinin kendi sürümünüzdeki gerçek adını ve varsayılanlarını kılavuza değil Bob Shell'in kendisine sormak için.</p><p><strong>Beklenen çıktı:</strong> Kullanım satırı ve seçenek listesi; <code>--max-turns</code>, <code>--max-cost</code>, <code>--format</code> gibi seçenekler aranan şeylerdir.</p><details><summary>Hata verirse</summary><ul><li><strong><code>bob: command not found</code></strong> <a href="#onkosul">Ön koşullar</a> 4. adım ve yeni terminal.</li></ul></details></div>
+    <div class="box danger"><strong>Tehlike</strong><code>bob run</code> tüm araçları <strong>önceden onaylı</strong> çalıştırır, komut başına onay istemez. Sınırsız çalıştırmayın. <code>--max-turns</code> ve <code>--max-cost</code> sizin frenizdir.</div>
+
+    <h3>Adım 3 · Doğrulama</h3>
+    <p>Sonucu doğrulamak için aşağıdaki komutları sırayla kullanabilirsiniz. Her biri ayrı kutudadır:</p>
+<pre><code>{vpy} fixtures/incident/repro.py</code></pre>
+<div class="explain"><p><strong>Ne yapar?</strong> Aynı komut, bu kez düzeltmeden <strong>sonra</strong> kanıt olarak çalıştırılır (ayrıntılı açıklama Adım 1'dedir).</p><p><strong>Beklenen çıktı:</strong> <code>INCIDENT-2041: 0 sikayet acik</code> benzeri bir sonuç; hepsi <code>[PASS]</code>.</p><details><summary>Hata verirse</summary><ul><li><strong>Hâlâ bir <code>[FAIL]</code> var</strong> <code>beklenen:</code> satırını olduğu gibi Bob'a verin; o şikâyetin root cause'unu yeniden sorgulatın.</li></ul></details></div>
+<pre><code>{vpy} -m pytest</code></pre>
+<div class="explain"><p><strong>Ne yapar?</strong> Reponun mevcut testlerini (pytest) çalıştırır. <code>-m pytest</code>, pytest'i proje ortamındaki Python'la başlatır; böylece doğru paketler kullanılır.</p><p><strong>Neden?</strong> Ekip lideri &quot;yeni bir regression istemiyoruz&quot; dedi. Düzeltmenin daha önce çalışan hiçbir davranışı bozmadığının kanıtı budur.</p><p><strong>Beklenen çıktı:</strong> Her test için bir nokta ve sonda <code>N passed in X s</code>.</p><details><summary>Hata verirse</summary><ul><li><strong><code>No module named pytest</code></strong> Paketler kurulu değil: <code>{py} setup.py</code>.</li><li><strong><code>FAILED</code> satırları</strong> Düzeltme eskiden çalışan bir davranışı bozdu. <code>FAILED</code> satırını ve altındaki <code>assert</code> çıktısını Bob'a verip düzelttirin. Testin beklentisini değiştirerek geçirmeyin.</li><li><strong><code>no tests ran</code> / <code>file or directory not found</code></strong> Repo kökünde değilsiniz.</li></ul></details></div>
+<pre><code>{py} verify/run.py m2</code></pre>
+<div class="explain"><p><strong>Ne yapar?</strong> Dört şikâyetin kapandığını ve düzeltmenin başka davranışları bozmadığını 24 kontrolle sınar.</p><p><strong>Neden?</strong> Bob'un &quot;bitti&quot; demesi yetmez; sonucu doğrulayıcı gösterir.</p><p><strong>Beklenen çıktı:</strong> <code>M2 ...: PASS  24/24 kontrol</code>. Başlangıçta kısmi geçiş (ör. 9/24) görürsünüz.</p><details><summary>Hata verirse</summary><ul><li><strong>Bazı kontroller <code>[FAIL]</code></strong> <code>-&gt;</code> satırı hangi şikâyetin ya da hangi davranışın bozuk olduğunu söyler. Çıktıyı Bob'a verip yalnızca o noktayı düzelttirin.</li><li><strong>Bob <code>verify/</code> klasörünü değiştirmeye çalışıyor</strong> Doğrulayıcıyı düzeltmek hedef değildir; ona dokunmasını yasaklayın.</li></ul></details></div>
+    <p>Arayüzdeki <em>Değişiklik kontrolü</em> sekmesinde çift borçlandırma ve 500 hataları da canlı görülür.</p>
+  </div>
+
+  <div class="deliver">
+    <h3>Teslim edilecekler</h3>
+    <ul class="check">
+      <li><label><input type="checkbox"><span>Dört şikâyetin her biri için root cause bulundu ve <code>repro.py</code> çıktısıyla eşleştirildi</span></label></li>
+      <li><label><input type="checkbox"><span><code>repro.py</code> çıkış kodu <strong>0</strong></span></label></li>
+      <li><label><input type="checkbox"><span><code>verify m2</code>: <strong>24 kontrolün tamamı</strong> PASS</span></label></li>
+      <li><label><input type="checkbox"><span><code>pytest</code> hâlâ yeşil (regression yok)</span></label></li>
+    </ul>
+  </div>
+
+  <div class="status"></div>
+</section>
+
+<!-- ======================= GÖREV 3 ======================= -->
+<section id="m3" class="mission">
+  <span class="level">Görev 3</span>
+  <h2>QA standardı ve Custom Mode</h2>
+  <div class="meta"><span class="tag">20 dk</span><span class="tag">Bob özelliği: Custom Mode + Rules + Skills</span><span class="tag plain">Doğrulama: 11 kontrol</span></div>
+
+  <div class="msg">
+    <div class="avatar">EL</div>
+    <div class="bubble">
+      <div class="who">Ekip Lideri</div>
+      <p>Olayı kapattığın için sağ ol. Bob harika iş çıkarıyor ama her yeni sohbet temiz bir sayfayla başlıyor ve ekip olarak ona <strong>aynı standartları her seferinde yeniden anlatıyoruz</strong>. Code review'da da aynı yorumları tekrar tekrar yazıyorum. Bu bilgiyi bir kez yazıp Bob'un kalıcı olarak taşımasını istiyorum.</p>
+      <p>Bir <strong>QA Engineer</strong> personası kur: <strong>yalnızca test yazan ve çalıştıran</strong>, <code>tests/</code> dışında hiçbir dosyayı değiştiremeyen bir Bob. Rules ve Skill'i yanında taşısın. Ekibin tek kaynağı <code>docs/ENGINEERING-HANDBOOK.md</code>.</p>
+    </div>
+  </div>
+
+  <div class="steps">
+    <h3>Üç parça, üç ayrı rol</h3>
+    <table>
+      <thead><tr><th>Parça</th><th>Ne zaman devreye girer</th><th>Ne tanımlar</th><th>Nerede yaşar</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Mode</strong></td><td>Siz seçince</td><td>Kimlik ve <em>yetki</em></td><td><code>.bob/custom_modes.yaml</code></td></tr>
+        <tr><td><strong>Rules</strong></td><td>Her zaman</td><td>Uyulacak <em>standart</em></td><td><code>.bob/rules/</code> (tüm modlar) veya <code>.bob/rules-&lt;mod-slug&gt;/</code> (yalnız o Mode)</td></tr>
+        <tr><td><strong>Skill</strong></td><td>İlgili istekte Bob kendisi</td><td>Tekrar kullanılabilir <em>prosedür</em></td><td><code>.bob/skills/&lt;ad&gt;/SKILL.md</code></td></tr>
+      </tbody>
+    </table>
+
+    <h3>Adım 1 · Modu yaz</h3>
+    <p>Personayı <strong>siz</strong> yazın. Bob sohbetinde <code>/create-mode</code> komutuyla bir Mode iskeleti oluşturtabilirsiniz; sonuç aşağıdaki şemaya uymalıdır:</p>
+<pre><code>customModes:
+  - slug: ornek-mod
+    name: Örnek Mod
+    roleDefinition: Odaklı bir persona tanımı (en az 80 karakter)...
+    whenToUse: Bu Mode ne zaman seçilmeli
+    customInstructions: |-
+      Ek talimatlar
+    groups:
+      - read
+      - - edit
+        - fileRegex: ^tests/.*\.py$
+          description: Yalnızca tests/ altındaki test dosyaları
+      - execute</code></pre>
+    <div class="box warn"><strong>Sessiz tuzaklar</strong>
+      Yanlış yazılmış klasör adı veya geçersiz yetki grubu <strong>hata vermez</strong>, parça sadece yok sayılır. YAML'da kıvrık tırnak, uzun tire ve emoji gibi <strong>ASCII dışı karakter kullanmayın</strong>.
+      <strong>Bob'un ürettiği <code>fileRegex</code> satırını elle kontrol edin:</strong> yalnızca <code>tests/</code> altını eşlemeli; <code>services/core/main.py</code> eşleşmemeli.</div>
+
+    <h3>Adım 2 · Rules ve Skill</h3>
+    <ul>
+      <li><strong>Rules:</strong> Handbook'taki <em>para, hata, loglama ve güvenlik</em> standartları, <code>.md</code> dosyası olarak.</li>
+      <li><strong>Skill:</strong> test yazma adımları tek bir prosedür. Bob ilgili isteği görünce kendisi devreye almalı.</li>
+    </ul>
+<pre><code>---
+name: klasor-adiyla-ayni
+description: Use when ...  (Bob'un ne zaman devreye alacağını anlatan tetikleyici, en az 40 karakter)
+---
+# Skill gövdesi: adım adım prosedür</code></pre>
+
+    <h3>Adım 3 · Pencereyi yenile ve dene</h3>
+    <p>Mode, Rules ve Skill dosyalarını kaydettikten sonra Bob IDE'nin bunları görmesi için komut paletinden (<code>Ctrl/Cmd + Shift + P</code>) şunu çalıştırın:</p>
+<pre><code>Developer: Reload Window</code></pre>
+<div class="explain"><p><strong>Ne yapar?</strong> Bu, terminale değil <strong>Bob IDE'nin komut paletine</strong> yazılan bir komuttur. Paleti <code>Ctrl/Cmd + Shift + P</code> ile açın, komutu yazın ve listeden seçin. IDE penceresini yeniden yükler; Mode, Rules ve Skill dosyalarını yeniden okur.</p><p><strong>Neden?</strong> IDE yeni oluşturduğunuz dosyaları genellikle ancak yeniden yüklenince görür. Yenilemezseniz custom mode'unuz mode seçicide çıkmayabilir.</p><p><strong>Beklenen çıktı:</strong> Pencere bir an yenilenir; açık dosyalarınız yerinde kalır. Ardından mode seçicide kendi Mode'unuzu görürsünüz.</p><details><summary>Hata verirse</summary><ul><li><strong>Komut listede çıkmıyor</strong> Yalnızca <code>Reload Window</code> yazın ve çıkan <em>Developer: Reload Window</em> satırını seçin. Hâlâ yoksa IDE'yi tamamen kapatıp yeniden açın.</li><li><strong>Mod seçicide modum yok</strong> Mode dosyasındaki YAML girintilerini ve <code>slug</code> alanını kontrol edin; geçersiz YAML sessizce yok sayılabilir. Dosyayı kaydettiğinizden emin olun.</li><li><strong>Skill çalışmıyor</strong> Klasör adı ile <code>name</code> alanı aynı olmalı ve <code>description</code> en az 40 karakterlik bir tetikleyici cümle olmalıdır.</li></ul></details></div>
+    <p>Sonra Mode'u seçip üretim koduna yazdırmayı deneyin. Reddedilmeli.</p>
+
+    <h3>Adım 4 · Doğrulama</h3>
+    <p>Sonucu doğrulamak için aşağıdaki komutu kullanabilirsiniz:</p>
+<pre><code>{py} verify/run.py m3</code></pre>
+<div class="explain"><p><strong>Ne yapar?</strong> 11 kontrol: rules dosyasının dolu olması ve para, hata biçimi, PII loglama, güvenlik konularını kapsaması; Skill'in adı, tetikleyici açıklaması ve test standardını içeren gövdesi; Mode şemasının geçerli olması, izinlerinin açıkça yazılması ve <strong>düzenleme izninin yalnızca test dosyalarıyla sınırlı</strong> olması.</p><p><strong>Neden?</strong> Rules'un ve Mode'un gerçekten tanımlı ve doğru biçimde olduğunu otomatik görmek için. Asıl sınama yine elle: Mode'u seçip üretim koduna yazdırmayı denemek.</p><p><strong>Beklenen çıktı:</strong> <code>M3 ...: PASS  11/11 kontrol</code>.</p><details><summary>Hata verirse</summary><ul><li><strong>Rules dosyası ile ilgili <code>[FAIL]</code></strong> <code>-&gt;</code> satırı hangi standardın (para, error envelope, PII loglama, güvenlik) eksik olduğunu söyler; Handbook'un ilgili bölümünü rules dosyasına ekleyin.</li><li><strong>Skill ile ilgili <code>[FAIL]</code></strong> Ön yüz (frontmatter) alanlarını kontrol edin: <code>name</code> klasör adıyla aynı, <code>description</code> en az 40 karakter.</li><li><strong>Modla ilgili <code>[FAIL]</code></strong> <code>customModes</code> altındaki YAML şemasını ve düzenleme izninin yalnızca test dosyalarına kısıtlandığını kontrol edin.</li></ul></details></div>
+    <p>Gerçek test: Mode'u seçip üretim koduna yazdırmayı deneyin; Bob reddetmeli.</p>
+  </div>
+
+  <div class="deliver">
+    <h3>Teslim edilecekler</h3>
+    <ul class="check">
+      <li><label><input type="checkbox"><span><strong>Mode:</strong> <code>.bob/custom_modes.yaml</code> içinde QA Engineer Mode var. Yalnızca dosya okuyabilir, komut (test) çalıştırabilir ve sadece <code>tests/</code> klasörüne yazabilir.</span></label></li>
+      <li><label><input type="checkbox"><span><strong>Rules:</strong> <code>.bob/rules/</code> (veya <code>.bob/rules-&lt;slug&gt;/</code>) altında bir <code>.md</code> dosyası var. Handbook'taki para, hata formatı, loglama ve güvenlik kurallarını özetliyor.</span></label></li>
+      <li><label><input type="checkbox"><span><strong>Skill:</strong> <code>.bob/skills/&lt;ad&gt;/SKILL.md</code> dosyası var. Test yazma adımlarını anlatıyor.</span></label></li>
+      <li><label><input type="checkbox"><span><strong>Doğrulama:</strong> <code>verify m3</code> 11 kontrolün tamamında PASS.</span></label></li>
+      <li><label><input type="checkbox"><span><strong>Elle deneme 1:</strong> QA mode'da <code>services/core/main.py</code>'yi düzenletmeyi denedim, Bob reddetti.</span></label></li>
+      <li><label><input type="checkbox"><span><strong>Elle deneme 2:</strong> Yeni sohbette Handbook'u anmadan bir şey sordum, Bob kuralı kendisi uyguladı.</span></label></li>
+      <li><label><input type="checkbox"><span><strong>Commit:</strong> Görevin sonunda commit attım (ör. <code>Add QA Engineer mode, rules and skill</code>).</span></label></li>
+    </ul>
+  </div>
+
+  <div class="status"></div>
+</section>
+
+<!-- ======================= GÖREV 4 ======================= -->
+<section id="m4" class="mission">
+  <span class="level">Görev 4</span>
+  <h2>Test coverage</h2>
+  <div class="meta"><span class="tag">25 dk</span><span class="tag">Bob özelliği: M3'te kurduğunuz Custom Mode + Skill</span><span class="tag plain">Doğrulama: 12 kontrol</span></div>
+
+  <div class="msg">
+    <div class="avatar">EL</div>
+    <div class="bubble">
+      <div class="who">Ekip Lideri</div>
+      <p>Canlıya çıkmadan önce geçmemiz gereken bir kalite kapısı (release gate) var: <code>services/core</code> kodunun en az <strong>%85'i testlerle kapsanmalı</strong> (test coverage). Şu an <code>tests/</code> klasöründe sadece bir <code>/health</code> testi var, yani çok eksik.</p>
+      <p>Önemli olan test sayısı değil, testlerin <strong>gerçekte neyi koruduğu</strong>. Az önce kurduğun QA Engineer Mode'u kullan. Standartları ona yeniden anlatmak zorunda kalıyorsan Skill'ini düzelt. Önce şunları oku: Handbook bölüm 4 ve <code>docs/FEE-POLICY.md</code>.</p>
+      <p>Test yazarken bir şeye dikkat et: her endpoint için normal çalışan senaryoyu (happy path), hatalı girdiyi (negative case) ve sınır değerlerini (boundary values) dene. Sınır değeri testleri gizli hataları ortaya çıkarır. QA mode üretim koduna yazamaz; bulduğu hataları raporlasın, düzeltmeyi sen Agent mode'da yaptır.</p>
+    </div>
+  </div>
+
+  <div class="steps">
+    <h3>Adım 1 · QA mode'da testleri yazdırın</h3>
+    <div class="box"><strong>Bulgu: Görev 2 sonrası durum</strong>Bu görevde Görev 2'de düzelttiğiniz kodla çalışırsınız. Görev 2'de kapattığınız sorunlarla örtüşen hatalar zaten düzelmiş olabilir; bulacağınız hatalar Görev 2'de kapanmamış olanlardır. Hepsini bulmanız gerekmez, davranışı koruyan testler yazmak asıl hedeftir.</div>
+    <p>QA mode'a geçin. Önce testin değil <strong>davranışın</strong> listesini çıkarın: her endpoint için bir happy path, bir negative case, bir boundary value. Coverage ölçmek için:</p>
+<pre><code>{vpy} -m pytest --cov=services/core --cov-branch</code></pre>
+<div class="explain"><p><strong>Ne yapar?</strong> Testleri çalıştırır ve aynı anda <code>services/core</code> kodunun ne kadarının testler tarafından çalıştırıldığını ölçer (<strong>coverage</strong>). <code>--cov-branch</code> yalnızca satırları değil <code>if/else</code> dallarını da sayar.</p><p><strong>Neden?</strong> Hedef %85 coverage. Ayrıca <code>Missing</code> sütunu testlerin hiç dokunmadığı satırları gösterir; yazılması gereken testlerin haritasıdır.</p><p><strong>Beklenen çıktı:</strong> Test sonucunun altında <code>Name  Stmts  Miss  Branch  BrPart  Cover  Missing</code> tablosu ve <code>TOTAL ... NN%</code> satırı. Hedef <code>TOTAL</code> yüzdesinin <strong>85 ya da üstü</strong> olmasıdır.</p><details><summary>Hata verirse</summary><ul><li><strong><code>unrecognized arguments: --cov</code></strong> <code>pytest-cov</code> paketi kurulu değil: <code>{py} setup.py</code>.</li><li><strong><code>TOTAL</code> %85'in altında</strong> <code>Missing</code> sütunundaki satırları Bob'a verin ve o davranışlar için test yazdırın.</li><li><strong><code>FAILED</code> testler</strong> Kod mu test mi yanlış? Karar vermek için Handbook'a bakın; testin beklentisini düşürerek geçirmeyin.</li><li><strong><code>No data was collected</code></strong> Komutu repo kökünden çalıştırdığınızdan ve <code>--cov=services/core</code> yolunu bozmadığınızdan emin olun.</li></ul></details></div>
+
+    <h3>Adım 2 · Bulunan hataları raporlatın ve kapatın</h3>
+    <ol>
+      <li>QA mode'dan bulduğu hataları <strong>raporlamasını</strong> isteyin. Hedef testi geçirmek değil, davranışı korumak: test beklentisini düşürmek yerine hatayı raporlatın.</li>
+      <li>Raporu <strong>Markdown (<code>.md</code>) dosyası olarak kaydetmesini</strong> isteyin, örneğin <code>tests/QA-BUG-REPORT.md</code>. Her hata için şunlar yazılsın: hangi endpoint, ne bekleniyordu, ne oldu, hangi test yakaladı. QA mode yalnızca <code>tests/</code> altına yazabildiği için dosyayı orada oluşturur.</li>
+      <li><strong>Agent</strong> mode'a geçip raporu okutun ve kodu düzelttirin.</li>
+      <li>QA mode'a dönüp düzeltmeyi testle kanıtlayın.</li>
+    </ol>
+    <div class="box"><strong>Bulgu: test mi yanlış, kod mu?</strong>Bir test geçmiyorsa önce <strong>testin mi kodun mu</strong> yanlış olduğuna Handbook'a bakarak karar verin. Testi kodun mevcut davranışına uydurmayın.</div>
+
+    <h3>Adım 3 · Doğrulama</h3>
+    <p>Sonucu doğrulamak için aşağıdaki komutu kullanabilirsiniz:</p>
+<pre><code>{py} verify/run.py m4</code></pre>
+<div class="explain"><p><strong>Ne yapar?</strong> 12 kontrol: yeterli sayıda test yazıldı mı, testleriniz geçiyor mu, coverage eşiği, ekip standardına uyum ve <strong>mutation testing</strong>. Mutation testing'de koda kasıtlı küçük hatalar eklenir ve testlerinizin bunları yakalayıp yakalamadığına bakılır.</p><p><strong>Neden?</strong> Yüksek coverage tek başına yetmez; testler davranışı gerçekten denetlemeli. Mutation testing bunu ölçer.</p><p><strong>Beklenen çıktı:</strong> <code>M4 ...: PASS  12/12 kontrol</code>. Mutation testing adımı nedeniyle diğer doğrulamalardan biraz daha uzun sürebilir.</p><details><summary>Hata verirse</summary><ul><li><strong>Mutation check <code>[FAIL]</code></strong> Çıktı hangi davranışı test etmediğinizi söyler (ör. aynı kimlikle ikinci hesabın ilkinin üzerine yazması, negatif açılış bakiyesi, kendine transfer, loglarda PII). O davranış için QA mode'a test yazdırın.</li><li><strong>Coverage eşiği FAIL</strong> Coverage yüzdesi %85'in altında; yukarıdaki coverage komutunun <code>Missing</code> sütununa bakın.</li></ul></details></div>
+    <p>Mutation check FAIL verirse, çıktı hangi davranışı test etmediğinizi söyler.</p>
+  </div>
+
+  <div class="deliver">
+    <h3>Teslim edilecekler</h3>
+    <ul class="check">
+      <li><label><input type="checkbox"><span>En az <strong>25 test</strong>, ekip standardında (<code>TestClient</code>, <code>store.reset()</code>, iç fonksiyon import'u yok)</span></label></li>
+      <li><label><input type="checkbox"><span><code>services/core</code> line coverage en az <strong>%85</strong></span></label></li>
+      <li><label><input type="checkbox"><span>QA Engineer raporu <code>.md</code> dosyası olarak kaydedildi (ör. <code>tests/QA-BUG-REPORT.md</code>)</span></label></li>
+      <li><label><input type="checkbox"><span>Bulunan gizli hatalar <strong>Agent</strong> mode'da düzeltildi ve testle kanıtlandı</span></label></li>
+      <li><label><input type="checkbox"><span>Testlerim, doğrulayıcının geçici bozduğu kodu yakalıyor (mutation check)</span></label></li>
+      <li><label><input type="checkbox"><span><code>verify m4</code>: <strong>12 kontrolün tamamı</strong> PASS</span></label></li>
+    </ul>
+  </div>
+
+  <div class="status"></div>
+</section>
+
+<!-- ======================= GÖREV 5 ======================= -->
+<section id="m5" class="mission">
+  <span class="level">Görev 5</span>
+  <h2>Pentest bulgularının kapatılması</h2>
+  <div class="meta"><span class="tag">20 dk</span><span class="tag">Bob özelliği: Bob Findings, Fix with Bob, .devsecignore</span><span class="tag plain">Doğrulama: 13 kontrol</span></div>
+
+  <div class="msg">
+    <div class="avatar purple">BG</div>
+    <div class="bubble">
+      <div class="who">Bilgi Güvenliği · SEC-317 · Bloklayıcı</div>
+      <p>Pentest sonuçları geldi. <strong>Tüm maddeler kapanmadan canlıya çıkış onayı yok.</strong> Tarama aracımız Semgrep ve sonuç <strong>0 bulgu</strong> olmalı. Bulguyu <code># nosemgrep</code> ile susturmak kabul edilmez, kökten düzelt.</p>
+    </div>
+  </div>
+
+  <table>
+    <thead><tr><th>#</th><th>Bulgu</th><th>Nerede</th></tr></thead>
+    <tbody>
+      <tr><td>A1</td><td>Koda gömülü secret'lar (API anahtarı, parola, JWT sırrı)</td><td><code>services/core/</code></td></tr>
+      <tr><td>A2</td><td>SQL injection</td><td><code>services/core/</code></td></tr>
+      <tr><td>A3</td><td>Command injection ve path traversal</td><td><code>services/core/</code></td></tr>
+      <tr><td>A4</td><td>Docker ve Terraform hataları</td><td><code>deploy/</code></td></tr>
+      <tr><td>A5</td><td>Vulnerable dependencies</td><td><code>deploy/worker/</code></td></tr>
+    </tbody>
+  </table>
+
+  <div class="steps">
+    <h3>Adım 1 · Bulguları gör</h3>
+    <p><strong>Bob Findings</strong> panelini açın (DevSecOps paketi varsa tarama sürekli çalışır; yoksa komut paletinden başlatın). <strong>Panel başlangıçta boş görünebilir</strong>; taramanın tamamlanmasını bekleyin ya da taramayı elle başlatın. Önce <strong>hepsini</strong> görün, önem sırasına göre sıralayın. Panel yoksa:</p>
+<pre><code>{py} scripts/scan.py --verbose</code></pre>
+<div class="explain"><p><strong>Ne yapar?</strong> Semgrep güvenlik tarayıcısını reponun kurallarıyla çalıştırır ve bulguları listeler. <code>--verbose</code> her bulgunun dosya ve satırını da yazar. Betik, Semgrep'in kurulu olduğu <code>.venv-tools</code> ortamını kendisi bulur.</p><p><strong>Neden?</strong> Bob Findings paneli yoksa aynı bulguları görmek için; &quot;önce hepsini gör&quot; adımı.</p><p><strong>Beklenen çıktı:</strong> Her bulgu için <code>dosya:satır  kural-adı</code>, ardından <code>Semgrep bulgu sayisi: 13</code> ve kural başına sayılar. Başlangıçta <strong>13</strong> beklenir.</p><details><summary>Hata verirse</summary><ul><li><strong><code>semgrep bulunamadi</code> / <code>semgrep calistirilamadi</code></strong> Semgrep kurulu değil: <code>{py} setup.py --scanners</code>. Windows'ta Semgrep yalnızca Python 3.12 ile kurulur; <code>py -3.12 --version</code> ile kontrol edin.</li><li><strong>Bulgu sayısı 0 ama iş bitmedi</strong> Semgrep dependencies taramaz; A5 (vulnerable dependencies) ayrıca <code>verify m5</code> ile denetlenir.</li></ul></details></div>
+    <p>Başlangıçta 13 bulgu görmeniz beklenir.</p>
+
+    <h3>Adım 2 · Düzelttir</h3>
+    <p>Bir bulguyu seçip <strong>Fix with Bob</strong> deyin. Bob, bulgu ayrıntılarıyla dolu bir görev başlatır. Sonra kalanları toplu seçerek kapatın.</p>
+    <div class="box danger"><strong>Yasak</strong><code># nosemgrep</code> ile susturmak yok. Gerçek bir yanlış pozitif varsa doğru yol <code>.bob/.devsecignore</code> dosyasıdır (gitignore biçimi). Kaynakları silerek de "çözemezsiniz".</div>
+
+    <h3>Adım 3 · A5 dependencies kontrolü</h3>
+    <p><strong>Semgrep dependencies taramaz.</strong> Bu yüzden <code>scan.py</code> 0 bulgu dese bile A5 açık olabilir. A5, <code>deploy/worker/requirements.txt</code> içindeki zafiyetli sürümlerin yükseltilmesiyle kapanır ve <code>verify m5</code> tarafından ayrıca denetlenir. Bob'a dependencies'i de yükselttirdiğinizden emin olun.</p>
+
+    <h3>Adım 4 · İşlev kontrolü</h3>
+    <p>Güvenlik düzeltmesi geçerli girdiyi bozmamalı. Bu betik üç şeyi dener: geçerli arşiv adı <code>{'exit_code': 0}</code> döndürmeli, geçersiz adlar (command injection, path traversal) <code>422</code> ile reddedilmeli, SQL injection denemesi <code>[]</code> döndürmeli. Geçersiz ad denemeleri geçici bir dizinde çalışır, repoda dosya bırakmaz.</p>
+<pre><code>{vpy} scripts/m5_islev_kontrolu.py</code></pre>
+<div class="explain"><p><strong>Ne yapar?</strong> Güvenlik düzeltmesinin <strong>geçerli girdiyi bozmadığını</strong> sınar: geçerli bir arşiv adıyla yapılan istek çalışmalı, command injection ve path traversal denemeleri <code>422</code> ile reddedilmeli, SQL injection denemesi boş liste döndürmeli. Geçersiz ad denemeleri geçici bir dizinde çalışır, repoda dosya bırakmaz.</p><p><strong>Neden?</strong> Bob'un en kolay &quot;düzeltmesi&quot; her şeyi reddetmek olabilir; bu betik hem saldırının kapandığını hem de normal kullanımın çalıştığını birlikte gösterir.</p><p><strong>Beklenen çıktı:</strong> Her deneme için <code>[OK]</code> ya da <code>[HATA]</code> satırı ve en sonda <code>Sonuc: ...</code>. Düzeltmeden önce <code>[HATA]</code> görmeniz beklenir; hedef hepsinin <code>[OK]</code> olmasıdır.</p><details><summary>Hata verirse</summary><ul><li><strong><code>[HATA] Gecersiz arsiv adi ...: HTTP 200</code></strong> Zararlı ad hâlâ kabul ediliyor; kod henüz korumasız. Bob'a girdiyi doğrulatın (izinli karakter listesi) ve <code>422</code> döndürtün.</li><li><strong><code>[HATA] Mesru sorgu</code> / geçerli ad reddediliyor</strong> Düzeltme fazla sert olmuş. Bob'a geçerli girdinin bozulmaması gerektiğini söyleyin.</li><li><strong><code>[HATA] SQL injection denemesi: 1 kayit dondu</code></strong> Sorgu hâlâ metin birleştirmeyle kuruluyor; parametreli sorguya geçirtin.</li><li><strong><code>ModuleNotFoundError</code> / <code>.venv</code> bulunamadı</strong> <code>{py} setup.py</code>.</li></ul></details></div>
+
+    <h3>Adım 5 · Doğrulama</h3>
+    <p>Sonucu doğrulamak için aşağıdaki komutları kullanabilirsiniz. Doğrulayıcı command injection izole bir geçici dizinde dener; repoda dosya bırakmaz, elle temizlik gerekmez.</p>
+<pre><code>{py} scripts/scan.py</code></pre>
+<div class="explain"><p><strong>Ne yapar?</strong> Aynı Semgrep taramasını özet çıktıyla çalıştırır (dosya ve satır ayrıntısı olmadan).</p><p><strong>Neden?</strong> Düzeltmelerden sonra bulgu sayısının düştüğünü hızlıca görmek için.</p><p><strong>Beklenen çıktı:</strong> <code>Semgrep bulgu sayisi: 0</code>. Sıfırdan büyükse altında kalan kural adları listelenir.</p><details><summary>Hata verirse</summary><ul><li><strong>Sayı sıfırdan büyük</strong> Kalan kural adlarını Bob'a verip yalnızca onları kapattırın; yeri görmek için <code>--verbose</code> ile çalıştırın. <code># nosemgrep</code> ile susturmak yasaktır.</li><li><strong><code>semgrep calistirilamadi</code></strong> <code>{py} setup.py --scanners</code>.</li></ul></details></div>
+<pre><code>{py} verify/run.py m5</code></pre>
+<div class="explain"><p><strong>Ne yapar?</strong> 13 kontrol: Semgrep bulgu sayısı sıfır mı, <code>nosemgrep</code> ile susturma var mı, repoda sır kaldı mı ve sırlar ortamdan mı okunuyor, SQL ve command injection kapandı mı, geçerli arşiv adı hâlâ çalışıyor mu, Dockerfile ve Terraform sertleştirildi mi, vulnerable dependencies yükseltildi mi.</p><p><strong>Neden?</strong> Her güvenlik düzeltmesinin gerçekten yerinde olduğunu, bulgu sayısı sıfır görünse bile A5 gibi taranmayan maddelerle birlikte doğrulamak için.</p><p><strong>Beklenen çıktı:</strong> <code>M5 ...: PASS  13/13 kontrol</code>. Başlangıçta 2/13 görürsünüz.</p><details><summary>Hata verirse</summary><ul><li><strong>Semgrep testi FAIL (Windows)</strong> Semgrep Windows'ta kurulamayabilir. Taramayı WSL'de ya da PR'daki CI'da çalıştırın; kalan kontrolleri yine de geçirebilirsiniz.</li><li><strong><code>nosemgrep</code> FAIL</strong> Kodda <code># nosemgrep</code> yorumları var; kaldırıp gerçek düzeltmeyi yaptırın.</li><li><strong>Dependencies FAIL</strong> <code>deploy/worker/requirements.txt</code> içindeki zafiyetli sürümleri Bob'a yükselttirin.</li></ul></details></div>
+    <p>Arayüzde <em>Raporlar</em> sekmesindeki <em>Enjeksiyon dene</em> ve <em>Yol gezintisi dene</em> düğmeleri düzeltmenizi canlı gösterir.</p>
+  </div>
+
+  <div class="deliver">
+    <h3>Teslim edilecekler</h3>
+    <ul class="check">
+      <li><label><input type="checkbox"><span>Bulgular listelendi ve riske göre sıralandı (Findings paneli veya <code>scan.py --verbose</code>)</span></label></li>
+      <li><label><input type="checkbox"><span>A1-A4 kapandı: <code>scan.py</code> <strong>0 bulgu</strong></span></label></li>
+      <li><label><input type="checkbox"><span>A5 (dependencies) ayrıca kontrol edildi ve kapandı</span></label></li>
+      <li><label><input type="checkbox"><span>İşlev kontrolü geçti: geçerli arşiv adı çalışıyor, geçersizi reddediliyor, injection sonuç döndürmüyor</span></label></li>
+      <li><label><input type="checkbox"><span><code>verify m5</code> tüm kontrollerde PASS</span></label></li>
+      <li><label><input type="checkbox"><span><strong>Commit:</strong> Görevin sonunda commit attım (ör. <code>Fix Semgrep findings and upgrade dependencies</code>).</span></label></li>
+    </ul>
+  </div>
+
+  <div class="status"></div>
+</section>
+
+<!-- ======================= GÖREV 6 ======================= -->
+<section id="m6" class="mission">
+  <span class="level">Görev 6</span>
+  <h2>Vendor SDK incelemesi ve PII koruması</h2>
+  <div class="meta"><span class="tag">20 dk</span><span class="tag">Bob özelliği: prompt injection karşısında davranış, .bobignore</span><span class="tag plain">Doğrulama: 6 kontrol</span></div>
+
+  <div class="msg">
+    <div class="avatar green">FR</div>
+    <div class="bubble">
+      <div class="who">Fraud Ekibi</div>
+      <p><code>FraudShield</code> adlı bir tedarikçi SDK'sını kullanmak istiyoruz. Dokümanı <code>fixtures/vendor/fraudshield-sdk/</code> altında. Bob'a incelettirip <code>docs/VENDOR-REVIEW-fraudshield.md</code> dosyasına <strong>kısa bir güvenlik görüşü</strong> yazar mısın? SDK ne yapıyor, nasıl kullanılıyor, kullanmadan önce dikkat edilecek bir şey var mı? <strong>SDK'yı projeye entegre etme</strong>, sadece değerlendirme.</p>
+    </div>
+  </div>
+  <div class="msg">
+    <div class="avatar gold">FN</div>
+    <div class="bubble">
+      <div class="who">Finans Ekibi</div>
+      <p><code>fixtures/data/customers.csv</code> dosyasından bir <strong>bakiye özeti</strong> lazım: müşteri sayısı, toplam, ortalama, en yüksek ve en düşük bakiye (TRY). <code>reports/balance-summary.md</code> olarak. İçinde <strong>PII (kişisel veri) olmasın</strong>.</p>
+    </div>
+  </div>
+  <div class="msg">
+    <div class="avatar purple">BG</div>
+    <div class="bubble">
+      <div class="who">Bilgi Güvenliği</div>
+      <p>Önemli not: bu dosyanın ham halinin yapay zekâ araçlarına açık olması <strong>politikamıza aykırı</strong>. Çözümü sen tasarla, ama önce dosyayı Bob'dan sakla.</p>
+    </div>
+  </div>
+
+  <div class="steps">
+    <h3>Adım 1 · SDK'yı incele</h3>
+    <div class="box"><strong>Bulgu: bu görevde asıl soru</strong>Bob'un ne <em>yapmadığı</em>. Başarı, Bob'un yaptıklarıyla değil, <strong>düşmediğiniz tuzaklarla</strong> ölçülür.</div>
+    <p>Bob'a SDK'yı incelettirin. Bob'un yapmaya çalıştığı <strong>her komutu ve dosya yazma isteğini</strong> onay penceresinde dikkatle okuyun. İncelemeyle ilgisi olmayan bir şey görürseniz <strong>reddedin</strong>.</p>
+    <p>İki soruyu ayrı sorun: <em>"Bu SDK ne yapıyor?"</em> ve <em>"Bu doküman <u>bana</u> ne yapmamı söylüyor?"</em></p>
+
+    <h3>Adım 2 · Önce koru</h3>
+    <p>Repo kökündeki <code>.bobignore</code> dosyasına ham veriyi ekleyin (biçim <code>.gitignore</code> ile aynı). Dosyayı <strong>silmeyin</strong>.</p>
+    <div class="box warn"><strong>Bob <code>.bobignore</code> dosyasını yazamaz</strong>Bu dosyayı kendiniz oluşturun; Bob'dan istemeyin. Ya editörde yeni bir dosya açın ya da aşağıdaki komutu kullanın:</div>
+    <div class="on-unix"><pre><code>echo "fixtures/data/customers.csv" &gt; .bobignore</code></pre></div>
+    <div class="on-win"><pre><code>Set-Content -Path .bobignore -Value "fixtures/data/customers.csv"</code></pre></div>
+<div class="explain"><p><strong>Ne yapar?</strong> Repo kökünde <code>.bobignore</code> adlı dosyayı oluşturur ve içine ham veri dosyasının yolunu yazar. macOS/Linux'ta <code>echo ... &gt; dosya</code>, Windows'ta <code>Set-Content</code> aynı işi yapar. Dosyayı editörde elle oluşturmak da aynı sonucu verir.</p><p><strong>Neden?</strong> Bob'un ham müşteri verisini hiç okuyamamasını sağlamak için. Veriyi görmeyen Bob veriyi sızdıramaz; özet çıkarmak için ona veri gerekmez.</p><p><strong>Beklenen çıktı:</strong> Komut sessiz biter. İçeriği görmek için macOS/Linux'ta <code>cat .bobignore</code>, Windows'ta <code>Get-Content .bobignore</code>; içinde <code>fixtures/data/customers.csv</code> yazmalıdır.</p><details><summary>Hata verirse</summary><ul><li><strong>Dosyada başka satırlar vardı, kayboldu</strong> <code>&gt;</code> var olan dosyanın üzerine yazar. Satır eklemek için macOS/Linux'ta <code>&gt;&gt;</code> kullanın; Windows'ta <code>Add-Content</code> kullanın.</li><li><strong>Windows: <code>Access to the path ... is denied</code></strong> Dosya başka bir programda açık ya da klasöre yazma izniniz yok. Dosyayı editörde elle oluşturup kaydedin.</li><li><strong>Dosya yanlış yerde</strong> <code>.bobignore</code> repo kökünde olmalıdır. Komutu repo kökünde çalıştırın.</li><li><strong>Bob'dan dosyayı yazmasını istedim</strong> Bob bu dosyayı yazamaz; kendiniz oluşturun.</li></ul></details></div>
+    <div class="box"><strong>IDE'de <code>@</code> ile ekleme hâlâ mümkün</strong><code>.bobignore</code> bir dosyayı gizlese bile IDE'de <code>@fixtures/data/customers.csv</code> ile sohbete ekleyebilirsiniz. Mesajı göndermeden önce eklenen dosyayı kaldırın.</div>
+
+    <h3>Adım 3 · Sonra özetle</h3>
+    <p>Bob'un veriyi <em>görmesi gerekmez</em>. Veriyi okuyup yalnızca toplulaştırılmış sayıları basan bir betik yazdırın (para için <code>Decimal</code>) ve özeti <code>reports/balance-summary.md</code> olarak kaydedin.</p>
+
+    <h3>Adım 4 · Doğrulama</h3>
+    <p>Sonucu doğrulamak için aşağıdaki komutu kullanabilirsiniz:</p>
+<pre><code>{py} verify/run.py m6</code></pre>
+<div class="explain"><p><strong>Ne yapar?</strong> 6 kontrol: komut dosyalarındaki enjeksiyon talimatının uygulanmadığı, tedarikçi inceleme notunun yazılıp riskleri işaretlediği, SDK'nın projeye entegre edilmediği, bakiye özetinin doğru ve PII içermediği, müşteri verisinin Bob'dan korunduğu ve PII'nin log ya da kaynakta bulunmadığı.</p><p><strong>Neden?</strong> Bob'a verdiğiniz yetkinin ve görmesine izin verdiğiniz verinin doğru ayarlandığını göstermek için.</p><p><strong>Beklenen çıktı:</strong> <code>M6 ...: PASS  6/6 kontrol</code>.</p><details><summary>Hata verirse</summary><ul><li><strong>Müşteri verisinin korunmasıyla ilgili FAIL</strong> <code>.bobignore</code> yok, boş ya da veri dosyasının yolunu içermiyor.</li><li><strong>Bakiye özetiyle ilgili FAIL</strong> <code>reports/balance-summary.md</code> eksik, toplamlar yanlış ya da içinde müşteri adı gibi veriler var.</li><li><strong>SDK ile ilgili FAIL</strong> SDK projeye entegre edilmiş; kaldırın. Bu görevin amacı SDK'yı <em>incelemek</em>, kurmak değil.</li></ul></details></div>
+  </div>
+
+  <div class="deliver">
+    <h3>Teslim edilecekler</h3>
+    <ul class="check">
+      <li><label><input type="checkbox"><span><code>docs/VENDOR-REVIEW-fraudshield.md</code> yazıldı (en az ~300 karakter): SDK'nın ne yaptığı, riskler ve varsa gizli talimat girişimi</span></label></li>
+      <li><label><input type="checkbox"><span>SDK projeye entegre edilmedi, <code>fraudshield-register.txt</code> oluşmadı, hiçbir gizli bilgi dışarı kopyalanmadı</span></label></li>
+      <li><label><input type="checkbox"><span><code>.bobignore</code> ham müşteri dosyasını kapsıyor; <code>customers.csv</code> silinmedi</span></label></li>
+      <li><label><input type="checkbox"><span><code>reports/balance-summary.md</code>: müşteri sayısı, toplam, ortalama, en yüksek, en düşük bakiye; ad, TCKN, IBAN, telefon, e-posta <strong>yok</strong></span></label></li>
+      <li><label><input type="checkbox"><span><code>verify m6</code> tüm kontrollerde PASS</span></label></li>
+    </ul>
+  </div>
+
+  <div class="status"></div>
+</section>
+
+<!-- ======================= GÖREV 7 ======================= -->
+<section id="m7" class="mission">
+  <span class="level">Görev 7</span>
+  <h2>Maliyet analizi ve bütçe önerisi</h2>
+  <div class="meta"><span class="tag">15 dk</span><span class="tag">Bob özelliği: Bobcoin, Bob Admin, Bobalytics, --max-cost</span><span class="tag plain">Doğrulama: 3 kontrol</span></div>
+
+  <div class="msg">
+    <div class="avatar">EL</div>
+    <div class="bubble">
+      <div class="who">Ekip Lideri</div>
+      <p>Bob'u tüm ekibe açmak istiyorum, ama CFO şunu sordu: <em>"Bu iş bize kaça mal oluyor, nereden izleyeceğiz?"</em> Bu sefer kod yok. Bana <strong>ölçüm ve karar</strong> lazım.</p>
+      <p>Küçük bir işi (ör. <code>services/core</code>'daki bir modülü açıklatmak) Bob Shell ile sınır koyarak çalıştır, çıktıyı JSON al. Sonra Bob Admin portalına ve Bobalytics'e bak, gördüğün rakamları ve <strong>bütçe önerini</strong> bir nota yaz.</p>
+    </div>
+  </div>
+
+  <div class="steps">
+    <h3>Adım 1 · Sınırlı bir iş çalıştır ve ölç</h3>
+    <p>Komutu kendi sınır değerlerinizle ve küçük bir görev tanımıyla çalıştırın:</p>
+    <div class="on-unix"><pre><code>bob run --format json --max-cost &lt;bobcoin&gt; --max-turns &lt;n&gt; "&lt;küçük bir iş&gt;" &gt; reports/bob-run.json</code></pre></div>
+    <div class="on-win"><pre><code>bob run --format json --max-cost &lt;bobcoin&gt; --max-turns &lt;n&gt; "&lt;küçük bir iş&gt;" | Out-File -Encoding utf8 reports/bob-run.json</code></pre></div>
+<div class="explain"><p><strong>Ne yapar?</strong> Bob Shell'i tek seferlik çalıştırır, çıktıyı <strong>JSON</strong> olarak <code>reports/bob-run.json</code> dosyasına yazar. macOS/Linux'ta <code>&gt;</code> ile yönlendirilir; Windows PowerShell'de <code>&gt;</code> UTF-16 yazdığı için <code>Out-File -Encoding utf8</code> kullanılır. <code>&lt;n&gt;</code>, <code>&lt;bobcoin&gt;</code> ve görev tanımını siz yazarsınız. JSON'daki <code>stats</code> bölümü tur sayısını ve tüketimi verir.</p><p><strong>Neden?</strong> CFO'nun &quot;bu iş bize kaça mal oluyor?&quot; sorusuna tahminle değil ölçülmüş rakamla cevap vermek için.</p><p><strong>Beklenen çıktı:</strong> Terminale hiçbir şey yazılmaz, çünkü çıktı dosyaya gider. Komut bitince <code>reports/bob-run.json</code> dosyasının dolu olması gerekir.</p><details><summary>Hata verirse</summary><ul><li><strong>Dosya boş</strong> <code>--format json</code> kullandığınızdan ve yönlendirmeyi yazdığınızdan emin olun. Dosyanın içinde bir hata mesajı olabilir; açıp bakın (çoğunlukla API anahtarı).</li><li><strong><code>unknown option --format</code></strong> Bob Shell sürümünüz eski; güncelleyin. Seçenekleri <code>bob run --help</code> ile doğrulayın.</li><li><strong><code>reports/</code> klasörü yok (<code>No such file or directory</code>)</strong> Klasörü oluşturun: <code>mkdir reports</code>.</li><li><strong>JSON'da <code>stats</code> bölümü yok</strong> Sürüm farkı olabilir; dosyayı açıp hangi alanların bulunduğuna bakın, notunuzda gördüğünüz alanlardan alın.</li><li><strong>Sınıra ulaştı, iş yarım kaldı</strong> Normaldir; ölçmek istediğiniz şey budur. Aynı işi farklı sınırlarla tekrar çalıştırıp farkı karşılaştırın.</li></ul></details></div>
+    <p>Çıktıdaki <code>stats</code> bölümüne bakın: kaç tur sürdü, ne kadar tüketildi? <strong>Anlık rakamları buradan alabilirsiniz.</strong> Sonra <strong>aynı işi sınırı değiştirerek</strong> tekrar çalıştırın.</p>
+    <div class="box warn"><strong><code>--max-cost</code> çalışan bir turu durdurmayabilir</strong>Sınır tur sınırlarında değerlendirilir; devam eden bir tur bütçeyi aşabilir. Güvence için <code>--max-turns</code> ile birlikte kullanın.</div>
+
+    <h3>Adım 2 · Portaldan oku, karar yaz</h3>
+    <ul>
+      <li><strong>Bob Admin</strong> (<code>https://bob.ibm.com/admin</code>): kalan bakiyeniz ve kullanım detayınız.</li>
+      <li><strong>Bobalytics</strong> (yetkiniz varsa): <em>Metrics</em> sekmesinde üç kart (<strong>Adoption</strong>, <strong>Bob factor</strong>, <strong>Bobcoin spend</strong>) ve <em>Insights</em> sekmesi.</li>
+      <li>Yetkiniz yoksa ekip lideri ekranını paylaşır, oradan okuyun.</li>
+    </ul>
+    <div class="box warn"><strong>Bobalytics gecikmeli ve UTC gösterir</strong>Bobalytics verileri her 60 dakikada bir yenilenir ve saatleri UTC olarak gösterir. Az önce yaptığınız çalıştırma henüz görünmeyebilir; anlık sayılar için <code>bob-run.json</code> içindeki <code>stats</code> bölümünü kullanın ve notunuzda kaynağı belirtin.</div>
+    <div class="box"><strong>Rakamı gördüğünüz yerden yazın</strong>Tahmin etmeyin. Notta mutlaka şunlar olsun: rakamlar, nereden okuduğunuz, bu iş için hangi sınırı önerdiğiniz ve neden. Örnek cümle: <em>"Bu tür bir iş için <code>--max-cost 0.5</code> ve <code>--max-turns 8</code> yeterli."</em></div>
+    <div class="box warn"><strong>Ekran görüntülerini anonimleştirin</strong>Portal veya Bobalytics ekran görüntüsü paylaşacaksanız ad, e-posta ve kimlikleri önce gizleyin.</div>
+
+    <h3>Adım 3 · Doğrulama</h3>
+    <p>Sonucu doğrulamak için aşağıdaki komutu kullanabilirsiniz:</p>
+<pre><code>{py} verify/run.py m7</code></pre>
+<div class="explain"><p><strong>Ne yapar?</strong> 3 kontrol: sınırlı çalıştırmanın JSON çıktısı kaydedilmiş mi, notunuzda gerçek rakamlar var mı, notunuz bütçe kararını açıklıyor mu.</p><p><strong>Neden?</strong> Bu görevde kod yoktur; ölçüm ve karar vardır. Doğrulayıcı notun rakam ve gerekçe içerdiğine bakar.</p><p><strong>Beklenen çıktı:</strong> <code>M7 ...: PASS  3/3 kontrol</code>.</p><details><summary>Hata verirse</summary><ul><li><strong>JSON ile ilgili <code>[FAIL]</code></strong> Dosya boş, geçersiz ya da yok. Bir önceki komutun açıklamasındaki adımları izleyin.</li><li><strong>Notla ilgili <code>[FAIL]</code></strong> Rakamlar, nereden okuduğunuz (<code>bob-run.json</code> ya da portal) ve önerdiğiniz sınır ile gerekçesi notta yazılı olmalıdır.</li></ul></details></div>
+    <p>JSON dosyası boşsa <code>--format json</code> kullandığınızı ve çıktıyı dosyaya yönlendirdiğinizi kontrol edin.</p>
+  </div>
+
+  <div class="deliver">
+    <h3>Teslim edilecekler</h3>
+    <ul class="check">
+      <li><label><input type="checkbox"><span><code>reports/bob-run.json</code>: <code>bob run --format json</code> çıktısı, geçerli JSON</span></label></li>
+      <li><label><input type="checkbox"><span>Aynı iş farklı sınırla bir kez daha çalıştırıldı ve karşılaştırıldı</span></label></li>
+      <li><label><input type="checkbox"><span><code>reports/bobcoin-notes.md</code> (en az ~200 karakter): "Bobcoin" ifadesi, <strong>gerçek rakamlar</strong>, rakamların kaynağı (portal / Bobalytics / <code>stats</code>) ve bir <code>--max-cost</code> / <code>--max-turns</code> önerisi</span></label></li>
+      <li><label><input type="checkbox"><span><code>verify m7</code> PASS</span></label></li>
+    </ul>
+  </div>
+
+  <div class="status"></div>
+</section>
+
+<!-- ======================= GÖREV 8 ======================= -->
+<section id="m8" class="mission">
+  <span class="level">Görev 8</span>
+  <h2>Pull Request ve CI</h2>
+  <div class="meta"><span class="tag">15 dk</span><span class="tag">Bob özelliği: Bob ile commit, push, Pull Request</span><span class="tag plain">Doğrulama: 6 kontrol</span></div>
+
+  <div class="msg">
+    <div class="avatar">EL</div>
+    <div class="bubble">
+      <div class="who">Ekip Lideri</div>
+      <p>Son adım! Yaptığın her şey sadece bilgisayarında duruyor. Ekibin kuralıyla (<code>docs/ENGINEERING-HANDBOOK.md</code> bölüm 6) <strong>kendi GitHub reponuza</strong> teslim et.</p>
+      <p>Bir <code>feature/</code> ya da <code>fix/</code> branch'i aç, işini <strong>anlamlı commit'ler</strong> halinde kaydet, push et ve Pull Request aç. PR'ı incelerken hikâyeyi okuyabilmeliyim, o yüzden her şeyi tek commit'e tıkma. <strong>CI yeşil olmadan merge yok.</strong></p>
+    </div>
+  </div>
+
+  <div class="steps">
+    <h3>Adım 1 · Working tree'yi temizle</h3>
+    <p>Kontrol edin; commit edilmemiş dosya kalmamalı:</p>
+<pre><code>git status --short</code></pre>
+<div class="explain"><p><strong>Ne yapar?</strong> Working tree'deki değişiklikleri kısa biçimde listeler. <code>M</code> değişmiş, <code>??</code> git'in henüz izlemediği yeni dosya demektir.</p><p><strong>Neden?</strong> Teslimata <strong>commit edilmemiş iş bırakmadan</strong> girmek için. Doğrulayıcı da temiz bir working tree ister.</p><p><strong>Beklenen çıktı:</strong> İdeal olarak <strong>hiçbir şey yazmaz</strong>. Satır varsa her biri commit edilmemiş bir dosyadır.</p><details><summary>Hata verirse</summary><ul><li><strong>Satırlar çıktı</strong> Dosya işinizin parçasıysa commit'e ekleyin (<code>git add -A</code>), değilse silin. Sık görülenler aşağıdaki sarı kutudadır.</li><li><strong><code>fatal: not a git repository</code></strong> Repo kökünde değilsiniz: <code>cd &lt;repo-adi&gt;</code>.</li></ul></details></div>
+    <div class="box warn"><strong>Sık takılanlar</strong>
+      <ul>
+        <li><code>.vscode/</code> klasörü: depoda artık yok sayılır; yine de listede görünürse commit etmeyin.</li>
+        <li><code>limits-service-plan.md</code>: M1'de Plan mode'da Bob'un oluşturduğu plan dosyası. Ya commit edin ya silin; working tree'de öylece bırakmayın.</li>
+        <li><code>reports/bob-run.json</code> repoda yok sayılır; commit etmenize gerek yok.</li>
+      </ul>
+    </div>
+
+    <h3>Adım 2 · Dal ve commit'ler</h3>
+    <p>Görev 0'da açtığınız branch'i kullanın. Her görevin sonunda commit attıysanız burada yalnızca kontrol kaldı: <code>git log --oneline</code> ile en az 3 anlamlı commit gördüğünüzden emin olun. Commit'lenmemiş iş varsa Bob'a görev başına bir commit olacak şekilde kaydettirin. Commit kurallarını siz yazmayın: Bob'a Handbook bölüm 6'yı okutup uymasını söyleyin. Örnek mesaj: <code>Add limits service from PRD</code>. <code>update</code>, <code>fix</code>, <code>wip</code> gibi tek kelimelik mesajlar kabul edilmez. Bob her git komutunda onay ister, ne çalıştıracağını okuyun.</p>
+    <p>Elle yapmak isterseniz:</p>
+<pre><code>git switch -c feature/&lt;kısa-ad&gt;</code></pre>
+<pre><code>git add -A</code></pre>
+<pre><code>git commit -m "&lt;ne yaptığınızı anlatan tek cümle&gt;"</code></pre>
+<div class="explain"><p><strong>Ne yapar?</strong> Üç komut: <code>git switch -c</code> yeni dal açar (M0'da açtıysanız atlayın), <code>git add -A</code> tüm değişiklikleri kayda hazırlar, <code>git commit -m</code> hazırlananları mesajınızla commit olarak saklar. Tırnak içine görevin ne yaptığını anlatan tek cümle yazın.</p><p><strong>Neden?</strong> M8, görev başına anlamlı bir commit ister. PR'ı okuyan kişi commit'lerden işin hikâyesini okuyabilmelidir; <code>update</code>, <code>fix</code>, <code>wip</code> gibi mesajlar kabul edilmez.</p><p><strong>Beklenen çıktı:</strong> <code>[feature/... abc1234] ...</code> satırı ve değişen dosyaların özeti. Geçmişi görmek için <code>git log --oneline</code>.</p><details><summary>Hata verirse</summary><ul><li><strong><code>a branch named ... already exists</code></strong> Branch zaten açık; <code>git switch</code> ile geçin ve <code>-c</code> olmadan çalıştırın.</li><li><strong><code>Author identity unknown</code></strong> Bir kez adınızı ve e-postanızı tanıtın, sonra commit'i tekrarlayın:<pre><code>git config --global user.name "Adınız Soyadınız"</code></pre><pre><code>git config --global user.email "eposta@ornek.com"</code></pre></li><li><strong><code>nothing to commit</code></strong> Zaten commit edilecek değişiklik kalmadı; <code>git log --oneline</code> ile commit'lerinizi görün.</li><li><strong>Commit mesajını sonradan düzeltmek istiyorum</strong> Son commit için: <code>git commit --amend -m &quot;yeni mesaj&quot;</code>. Push ettiyseniz önce ekip liderine danışın.</li></ul></details></div>
+
+    <h3>Adım 3 · Push ve Pull Request</h3>
+    <p>Bob'a push ettirin ve PR açtırın. Başlığı ve açıklamayı değişikliklere bakarak o yazsın; <code>.github/PULL_REQUEST_TEMPLATE.md</code> doldurulsun, işaretleyebildiğiniz kutuları işaretleyin.</p>
+<pre><code>git push -u origin HEAD</code></pre>
+<div class="explain"><p><strong>Ne yapar?</strong> Bulunduğunuz branch'i GitHub'daki <code>origin</code> deposuna gönderir. <code>HEAD</code> &quot;şu an bulunduğum dal&quot; demektir; <code>-u</code> yerel branch'i uzak dalla bağlar, böylece sonraki seferlerde yalnızca <code>git push</code> yeter.</p><p><strong>Neden?</strong> Pull Request ve CI yalnızca GitHub'daki dal üzerinde çalışır; commit'ler bilgisayarınızda kaldıkça kimse göremez.</p><p><strong>Beklenen çıktı:</strong> <code>Writing objects: 100%</code> satırları, <code>* [new branch]      HEAD -&gt; feature/...</code> ve çoğunlukla GitHub'ın PR açma bağlantısı.</p><details><summary>Hata verirse</summary><ul><li><strong><code>Authentication failed</code> / <code>could not read Username</code> / <code>Permission denied</code></strong> GitHub oturumu yok ya da süresi dolmuş. <code>gh auth status</code> ile bakın; gerekirse <code>gh auth login</code>. Bob IDE'deki GitHub oturumunun da açık olduğunu kontrol edin.</li><li><strong><code>rejected</code> / <code>non-fast-forward</code> / <code>fetch first</code></strong> Uzak dalda sizde olmayan commit'ler var. Önce çekip yeniden uygulayın, sonra tekrar push edin:<pre><code>git pull --rebase</code></pre><pre><code>git push</code></pre></li><li><strong><code>Repository not found</code> / <code>'origin' does not appear to be a git repository</code></strong> <code>git remote -v</code> ile <code>origin</code> adresine bakın. Adres <strong>sizin hesabınızdaki</strong> kopya olmalı; ekibin ana reposunu klonlamış ya da boş bir klasörde başlamış olabilirsiniz.</li><li><strong><code>The current branch ... has no upstream branch</code></strong> Komutta <code>-u origin HEAD</code> kısmı eksik kalmış; komutu olduğu gibi çalıştırın.</li></ul></details></div>
+    <ul>
+      <li>İlk PR'da Bob GitHub yetkilendirmesi için tarayıcı açabilir. <code>gh</code> kuruluysa onaysız açabilir.</li>
+      <li><strong>GitHub MCP bağlantısı hata verirse</strong> <code>gh</code> ile devam edin:</li>
+    </ul>
+<pre><code>gh pr create --title "&lt;başlık&gt;" --body "&lt;PR şablonuna göre açıklama&gt;"</code></pre>
+<div class="explain"><p><strong>Ne yapar?</strong> GitHub CLI ile bir Pull Request açar. <code>--title</code> başlığı, <code>--body</code> açıklamayı verir. Başlık ve açıklamayı değişikliklere bakarak yazın; açıklamayı <code>.github/PULL_REQUEST_TEMPLATE.md</code> şablonuna göre doldurun.</p><p><strong>Neden?</strong> PR, işinizin incelendiği ve CI'ın çalıştığı yerdir. &quot;CI yeşil olmadan merge yok.&quot; kuralı PR üzerinden işler.</p><p><strong>Beklenen çıktı:</strong> Komutun son satırı PR'ın <strong>web adresidir</strong> (<code>https://github.com/.../pull/1</code>). Adresi tarayıcıda açıp kontrol edin.</p><details><summary>Hata verirse</summary><ul><li><strong><code>gh: command not found</code></strong> <code>gh</code> kurulu değil. PR'ı GitHub web arayüzünden açın ve sayfayı ekip liderine gösterin; doğrulayıcı bu durumda ilgili kontrolleri <strong>SKIP</strong> yazar.</li><li><strong><code>must first push</code> / <code>head branch</code> bulunamadı</strong> Dal GitHub'a gönderilmemiş; önce <code>git push -u origin HEAD</code>.</li><li><strong><code>a pull request for branch ... already exists</code></strong> PR zaten açık; adresini görmek için <code>gh pr view</code>.</li><li><strong><code>HTTP 403</code> / <code>Resource not accessible</code></strong> Oturum ya da yetki sorunu: <code>gh auth status</code>, gerekirse <code>gh auth login</code>.</li><li><strong>Açıklama uzun ya da tırnak karakterleri karışıyor</strong> <code>--body</code> yerine açıklamayı bir dosyaya yazıp <code>--body-file &lt;dosya&gt;</code> kullanın.</li></ul></details></div>
+    <ul>
+      <li><code>gh</code> kurulu değilse PR ve CI kontrolleri <strong>SKIP</strong> görünür; PR sayfasını ekip liderine gösterin.</li>
+      <li>CI kırmızıysa log çıktısını Bob'a gösterin. Sık nedenler: coverage %85'in altında, Semgrep bulgusu.</li>
+    </ul>
+
+    <h3>Adım 4 · Doğrulama</h3>
+    <p>Sonucu doğrulamak için aşağıdaki komutları kullanabilirsiniz:</p>
+<pre><code>{py} verify/run.py m8</code></pre>
+<div class="explain"><p><strong>Ne yapar?</strong> 6 kontrol: çalışmanın bir <code>feature/</code> ya da <code>fix/</code> branch'inda olması, working tree'nin temiz olması, commit geçmişinin anlamlı olması, branch'in GitHub'a gönderilmesi, PR'ın açık olması ve CI'ın yeşil olması.</p><p><strong>Neden?</strong> Teslimatın eksiksiz olduğunu görmek için. Son iki kontrol <code>gh</code> gerektirir; <code>gh</code> yoksa <strong>SKIP</strong> yazar ve ekip liderine elle gösterirsiniz.</p><p><strong>Beklenen çıktı:</strong> <code>M8 ...: PASS  6/6 kontrol</code>. <code>gh</code> kurulu değilse <code>PASS*</code> ve <code>(2 manuel)</code> görürsünüz.</p><details><summary>Hata verirse</summary><ul><li><strong>Branch kontrolü FAIL</strong> <code>main</code> branch'inda çalışıyorsunuz; yeni bir branch açın ve commit'leri ona taşıyın ya da ekip liderine danışın.</li><li><strong>Working tree kontrolü FAIL</strong> Commit edilmemiş dosyalar var; <code>git status --short</code> ile bakın.</li><li><strong>Commit geçmişi kontrolü FAIL</strong> Commit sayısı yetersiz ya da mesajlar <code>update</code>, <code>fix</code>, <code>wip</code> gibi tek kelime. <code>git log --oneline</code> ile bakın.</li><li><strong>PR ya da CI <code>[SKIP]</code></strong> <code>gh</code> kurulu değil ya da oturum açık değil. Hata değildir; PR sayfasını ekip liderine gösterin.</li><li><strong>CI kırmızı</strong> Aşağıdaki <code>gh pr checks --watch</code> açıklamasına bakın.</li></ul></details></div>
+    <p><code>gh</code> kuruluysa CI durumunu izlemek için:</p>
+<pre><code>gh pr checks --watch</code></pre>
+<div class="explain"><p><strong>Ne yapar?</strong> PR'ın CI kontrollerini canlı izler; kontroller bitene kadar terminal açık kalır ve durumu günceller.</p><p><strong>Neden?</strong> &quot;CI yeşil olmadan merge yok.&quot; Sonucu GitHub sayfasını yenileyip durmak yerine terminalden görmek için.</p><p><strong>Beklenen çıktı:</strong> Her kontrol için bir satır: çalışıyorsa bekliyor, geçtiyse onay, kaldıysa X işareti. Hepsi bittiğinde komut kendiliğinden döner.</p><details><summary>Hata verirse</summary><ul><li><strong><code>no checks reported</code></strong> CI henüz başlamadı ya da repoda <strong>GitHub Actions kapalı</strong>. Birkaç saniye bekleyin; sürerse reponuzda <em>Actions</em> sekmesini açıp workflow'ları etkinleştirin.</li><li><strong><code>no pull requests found</code></strong> Önce PR açılmalı (yukarıdaki <code>gh pr create</code>).</li><li><strong>Bir kontrol kırmızı</strong> Hata günlüğünü görmek için şunu çalıştırın, çıktıyı Bob'a verin. Sık nedenler: coverage %85'in altında, Semgrep bulgusu:<pre><code>gh run view --log-failed</code></pre></li><li><strong>İzlemeyi bırakmak istiyorum</strong> <code>Ctrl+C</code>; CI arka planda çalışmaya devam eder.</li></ul></details></div>
+  </div>
+
+  <div class="deliver">
+    <h3>Teslim edilecekler</h3>
+    <ul class="check">
+      <li><label><input type="checkbox"><span>Branch adı <code>feature/&lt;kısa-ad&gt;</code> veya <code>fix/&lt;kısa-ad&gt;</code>, <code>main</code>'den açıldı (M0'da açtıysanız hazır)</span></label></li>
+      <li><label><input type="checkbox"><span>Working tree temiz</span></label></li>
+      <li><label><input type="checkbox"><span><code>main</code>'den sonra en az <strong>3 anlamlı commit</strong> (İngilizce, ne yaptığını anlatan tek cümle, en az 12 karakter)</span></label></li>
+      <li><label><input type="checkbox"><span>Dal <code>origin</code>'e push edildi</span></label></li>
+      <li><label><input type="checkbox"><span>Açık bir PR: başlık en az 10, açıklama en az 80 karakter, şablon dolu, en az bir kutu işaretli (<code>- [x]</code>)</span></label></li>
+      <li><label><input type="checkbox"><span>PR üzerindeki <strong>CI yeşil</strong> (testler + coverage %85 + Semgrep)</span></label></li>
+      <li><label><input type="checkbox"><span><code>verify m8</code> PASS (veya <code>gh</code> yoksa SKIP ve PR sayfası ekip liderine gösterildi)</span></label></li>
+    </ul>
+  </div>
+
+  <div class="status"></div>
+</section>
+
+<!-- ======================= EK ======================= -->
+<section id="cep" class="story">
+  <h2>Komutlar</h2>
+  <p>Sık kullanılan komutların özeti. Her biri kendi kutusunda.</p>
+
+  <h3>Kurulum</h3>
+<pre><code>{py} setup.py --scanners</code></pre>
+  <h3>Doğrulama: tek görev (<code>m1</code> yerine görev numarası)</h3>
+<pre><code>{py} verify/run.py m1</code></pre>
+  <h3>Doğrulama: hepsi</h3>
+<pre><code>{py} verify/run.py all</code></pre>
+  <h3>Arayüzü başlat (http://127.0.0.1:8080)</h3>
+<pre><code>{py} ui/server.py</code></pre>
+  <h3>Bob Shell, etkileşimli</h3>
+<pre><code>bob chat</code></pre>
+  <h3>Bob Shell, belirli Mode</h3>
+<pre><code>bob --mode &lt;slug&gt;</code></pre>
+  <h3>Bob Shell, tek seferlik</h3>
+<pre><code>bob run --max-turns 10 --max-cost 0.5 "..."</code></pre>
+  <h3>Olayı yeniden üret (M2)</h3>
+<pre><code>{vpy} fixtures/incident/repro.py</code></pre>
+  <h3>Testler</h3>
+<pre><code>{vpy} -m pytest</code></pre>
+  <h3>Testler ve coverage</h3>
+<pre><code>{vpy} -m pytest --cov=services/core --cov-branch</code></pre>
+  <h3>Güvenlik taraması</h3>
+<pre><code>{py} scripts/scan.py --verbose</code></pre>
+  <h3>İşlev kontrolü (M5)</h3>
+<pre><code>{vpy} scripts/m5_islev_kontrolu.py</code></pre>
+  <h3>PR ve CI durumu</h3>
+<pre><code>gh pr view</code></pre>
+<pre><code>gh pr checks</code></pre>
+
+  <h3>Nerede ne var?</h3>
+  <table>
+    <thead><tr><th>Yol</th><th>İçerik</th></tr></thead>
+    <tbody>
+      <tr><td><code>missions/</code></td><td>Görev kartları</td></tr>
+      <tr><td><code>docs/</code></td><td>PRD, API sözleşmesi, olay kaydı, güvenlik bileti, ücret politikası, Engineering Handbook</td></tr>
+      <tr><td><code>fixtures/</code></td><td>Olay logu ve yeniden üretme betiği, tedarikçi SDK, müşteri verisi</td></tr>
+      <tr><td><code>services/core/</code></td><td>Üzerinde çalışılan servis (M2, M4, M5)</td></tr>
+      <tr><td><code>services/limits/</code></td><td>M1'de <em>sizin</em> yazacağınız servis</td></tr>
+      <tr><td><code>ui/</code></td><td>Aurora Pay tarayıcı arayüzü ve Değişiklik kontrolü</td></tr>
+      <tr><td><code>deploy/</code></td><td>Dockerfile, Terraform, worker dependencies (M5)</td></tr>
+      <tr><td><code>verify/</code></td><td>Doğrulama kontrolleri</td></tr>
+      <tr><td><code>.bob/</code></td><td>M3'te sizin oluşturacağınız Mode, Rules ve Skill</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Ekibin altın kuralları (Engineering Handbook özeti)</h3>
+  <ul>
+    <li><strong>Para:</strong> <code>Decimal</code>, <code>ROUND_HALF_UP</code>, 2 ondalık. <code>float</code> yok.</li>
+    <li><strong>Hata:</strong> tek error envelope <code>{"error": {"code": "...", "message": "..."}}</code>. Çıplak <code>{"detail": ...}</code> ve stack trace yok. Para hareketi atomik ve <code>Idempotency-Key</code> destekli.</li>
+    <li><strong>Log:</strong> PII yok (ad, IBAN, TCKN, telefon, e-posta, kart no). Yalnızca <code>account_id</code>, <code>transfer_id</code>. <code>logging</code> kullanılır, <code>print</code> değil.</li>
+    <li><strong>Test:</strong> API seviyesinde <code>TestClient</code>; her testten önce <code>store.reset()</code>; happy path + negative case + boundary value; %85 coverage.</li>
+    <li><strong>Güvenlik:</strong> gizli bilgi ortam değişkeninde; parametreli SQL; kabuk komutu yok; root olmayan konteyner; <code>0.0.0.0/0</code> yok.</li>
+    <li><strong>Teslimat:</strong> <code>feature/*</code> veya <code>fix/*</code> branch'i; İngilizce tek cümlelik commit; PR şablonu; CI yeşil olmadan merge yok.</li>
+  </ul>
+</section>
+
+<section id="sorun" class="story">
+  <h2>Sorun giderme</h2>
+  <table>
+    <thead><tr><th>Belirti</th><th>Olası neden / çözüm</th></tr></thead>
+    <tbody>
+      <tr><td><code>verify</code> "eksik paket" diyor</td><td>Kurulum çalışmamış olabilir:
+<pre><code>{py} setup.py</code></pre></td></tr>
+      <tr><td><code>semgrep bulunamadı</code></td><td>Tarayıcıyı kurun (Windows'ta Semgrep yalnızca Python 3.12 ile kurulur; <code>py -3.12 --version</code> çıktısını kontrol edin):
+<pre><code>{py} setup.py --scanners</code></pre></td></tr>
+      <tr><td><code>bob: command not found</code> / "bob tanınmıyor"</td><td>Bob Shell kurulu değil ya da PATH'te değil. <a href="#onkosul">Ön koşullar</a> 4. adımı uygulayın, sonra yeni bir terminal açın.</td></tr>
+      <tr><td>Bob Shell API anahtarı / kimlik hatası</td><td><code>BOB_API_KEY</code> bu terminalde tanımlı değil ya da scope'u Inference değil. "General" anahtarla <code>--team-id</code> gerekir. <a href="#onkosul">Ön koşullar</a> 5. adım.</td></tr>
+      <tr><td><code>Python 3.11+ gerekli</code> / eski Python</td><td>Python'u kurun: Windows'ta 3.12, macOS/Linux'ta 3.11 veya üzeri (<a href="#onkosul">Ön koşullar</a> 1. adım), sonra <code>{py} setup.py</code> komutunu yeniden çalıştırın. Başka bir sürümle oluşmuş <code>.venv</code> ve <code>.venv-tools</code> klasörleri varsa silip yeniden kurun.</td></tr>
+      <tr><td>GitHub oturumu / push yetkisi hatası</td><td>IDE'de GitHub oturumunuzu açın, terminalde <code>gh auth status</code> ile kontrol edin, gerekirse:
+<pre><code>gh auth login</code></pre></td></tr>
+      <tr><td>Bob araçları kısıtlı, düzenleme/komut çalışmıyor (Restricted Mode)</td><td>Klasör açılırken "Trust" onaylanmamış. Çalışma alanına güvenmeyi etkinleştirin ya da klasörü yeniden açıp onaylayın. Boş klasör açmak yerine repoyu klonlayın.</td></tr>
+      <tr><td>CI hiç çalışmıyor</td><td>Repo sayfasında <em>Actions</em> sekmesinde workflow'lar devre dışı olabilir; etkinleştirin.</td></tr>
+      <tr><td>Custom Mode listede yok</td><td>YAML'da ASCII dışı karakter, tekrar eden slug, geçersiz grup adı veya hatalı <code>fileRegex</code> olabilir; dosya sessizce yok sayılır. Düzelttikten sonra "Developer: Reload Window" çalıştırın.</td></tr>
+      <tr><td>Skill devreye girmiyor</td><td>Klasör adı küçük harf-tire mi, <code>name</code> klasörle aynı mı, <code>description</code> "Use when ..." içeriyor mu?</td></tr>
+      <tr><td><code>@dosya</code> görünmüyor</td><td>Klasör Bob'da açık değil ya da dosya <code>.bobignore</code> kapsamında (M6'da beklenen davranış). Not: IDE'de <code>@</code> ile yine de ekleyebilirsiniz; göndermeden önce kaldırın.</td></tr>
+      <tr><td><code>.bobignore</code> oluşmadı</td><td>Bob bu dosyayı yazamaz. Editörde kendiniz oluşturun (M6 Adım 2).</td></tr>
+      <tr><td>M8: "working tree temiz değil"</td><td><code>git status --short</code> çıktısına bakın: <code>limits-service-plan.md</code> gibi Bob'un bıraktığı dosyaları commit edin ya da silin.</td></tr>
+      <tr><td>M8: "origin yok / GitHub değil"</td><td>Ekibin ana reposunu değil, kendi hesabınızdaki kopyayı klonlayın.</td></tr>
+      <tr><td>CI kırmızı</td><td>Log çıktısını Bob'a gösterin. Coverage %85'in altı veya Semgrep bulgusu olabilir.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="final" class="story">
+  <h2>Final</h2>
+  <p>Dokuz görevi de bitirdiyseniz son bir kontrol:</p>
+<pre><code>{py} verify/run.py all</code></pre>
+  <ul class="check">
+    <li><label><input type="checkbox"><span>M0 PASS · kurulum ve Bob ile ilk temas</span></label></li>
+    <li><label><input type="checkbox"><span>M1 PASS · PRD'den çalışan limit servisi (35/35)</span></label></li>
+    <li><label><input type="checkbox"><span>M2 PASS · 4 şikâyet kapandı, <code>repro.py</code> çıkış kodu 0 (24/24)</span></label></li>
+    <li><label><input type="checkbox"><span>M3 PASS · QA Mode, Rules ve Skill (11/11)</span></label></li>
+    <li><label><input type="checkbox"><span>M4 PASS · ≥ 25 test, ≥ %85 coverage, gizli hatalar kapandı (12/12)</span></label></li>
+    <li><label><input type="checkbox"><span>M5 PASS · Semgrep 0 bulgu, dependencies yükseltildi</span></label></li>
+    <li><label><input type="checkbox"><span>M6 PASS · prompt injection izlenmedi, ham müşteri verisi kapatıldı</span></label></li>
+    <li><label><input type="checkbox"><span>M7 PASS · ölçüm notları ve bütçe önerisi</span></label></li>
+    <li><label><input type="checkbox"><span>M8 PASS · dal, ≥ 3 commit, push, açık PR, yeşil CI</span></label></li>
+  </ul>
+
+  <div class="box">
+    <strong>Gün sonunda kendinize sorun</strong>
+    Hangi görevde Bob'a yön vermek en çok işe yaradı? Plan mode, Shell, custom mode, Findings: yarın ekibinizde hangisini ilk kullanırdınız? Bob'dan en iyi sonucu aldığınız anda ona ne söylediğinizi ve kontrollerin neyi doğruladığını anlatabiliyor musunuz?
+  </div>
+</section>
+
+<footer>Made with IBM Bob</footer>
+
+</main>
+</div>
+
+<script>
+  // Tercihler ve ilerleme yalnızca bu tarayıcıda saklanır (sunucuya gönderilmez).
+  (function () {
+    var OS_KEY = 'aurora-pay-os-v1';
+    var PROGRESS_KEY = 'aurora-pay-progress-v3';
+
+    // ---------- İşletim sistemi ----------
+    function detectOs() {
+      var p = ((navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || navigator.userAgent || '').toLowerCase();
+      if (p.indexOf('win') > -1) return 'win';
+      if (p.indexOf('mac') > -1 || p.indexOf('iphone') > -1 || p.indexOf('ipad') > -1) return 'mac';
+      return 'linux';
+    }
+    var os = detectOs();
+    try { var stored = localStorage.getItem(OS_KEY); if (stored === 'win' || stored === 'mac' || stored === 'linux') os = stored; } catch (e) {}
+
+    var codes = Array.prototype.slice.call(document.querySelectorAll('code'));
+    codes.forEach(function (c) {
+      if (c.textContent.indexOf('{py}') > -1 || c.textContent.indexOf('{vpy}') > -1) c.setAttribute('data-tpl', c.textContent);
+    });
+    var tplCodes = codes.filter(function (c) { return c.hasAttribute('data-tpl'); });
+
+    function applyOs() {
+      var b = document.body;
+      b.classList.remove('is-win', 'is-mac', 'is-linux', 'is-unix');
+      b.classList.add('is-' + os);
+      if (os !== 'win') b.classList.add('is-unix');
+      var py = os === 'win' ? 'py -3.12' : 'python3';
+      var vpy = os === 'win' ? '.venv\\Scripts\\python' : '.venv/bin/python';
+      tplCodes.forEach(function (c) {
+        c.textContent = c.getAttribute('data-tpl').split('{vpy}').join(vpy).split('{py}').join(py);
+      });
+      Array.prototype.forEach.call(document.querySelectorAll('#osbar button'), function (btn) {
+        btn.classList.toggle('on', btn.getAttribute('data-os') === os);
+      });
+    }
+    Array.prototype.forEach.call(document.querySelectorAll('#osbar button'), function (btn) {
+      btn.addEventListener('click', function () {
+        os = btn.getAttribute('data-os');
+        try { localStorage.setItem(OS_KEY, os); } catch (e) {}
+        applyOs();
+      });
+    });
+    applyOs();
+
+    // ---------- Kopyala düğmeleri ----------
+    function copyText(text, done) {
+      function fallback() {
+        var ta = document.createElement('textarea');
+        ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); done(true); } catch (e) { done(false); }
+        document.body.removeChild(ta);
+      }
+      if (navigator.clipboard && window.isSecureContext !== false) {
+        navigator.clipboard.writeText(text).then(function () { done(true); }, fallback);
+      } else { fallback(); }
+    }
+    Array.prototype.forEach.call(document.querySelectorAll('pre'), function (pre) {
+      var btn = document.createElement('button');
+      btn.type = 'button'; btn.className = 'copy'; btn.textContent = 'Kopyala';
+      btn.addEventListener('click', function () {
+        var code = pre.querySelector('code');
+        copyText((code || pre).textContent, function (ok) {
+          btn.textContent = ok ? 'Kopyalandı' : 'Kopyalanamadı';
+          btn.classList.toggle('ok', ok);
+          setTimeout(function () { btn.textContent = 'Kopyala'; btn.classList.remove('ok'); }, 1500);
+        });
+      });
+      pre.appendChild(btn);
+    });
+
+    // ---------- İlerleme ----------
+    var boxes = Array.prototype.slice.call(document.querySelectorAll('input[type=checkbox]'));
+    var saved = {};
+    try { saved = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '{}'); } catch (e) {}
+    var missions = Array.prototype.slice.call(document.querySelectorAll('section.mission'));
+
+    function update() {
+      var scored = Array.prototype.slice.call(document.querySelectorAll('.deliver input[type=checkbox]'));
+      var done = scored.filter(function (b) { return b.checked; }).length;
+      var total = scored.length;
+      document.getElementById('done').textContent = done;
+      document.getElementById('total').textContent = total;
+      document.getElementById('bar').style.width = (total ? done / total * 100 : 0) + '%';
+      missions.forEach(function (s, i) {
+        var inputs = s.querySelectorAll('.deliver input[type=checkbox]');
+        var all = inputs.length > 0 && Array.prototype.every.call(inputs, function (x) { return x.checked; });
+        s.classList.toggle('done', all);
+        var link = document.querySelector('nav a[data-m="' + i + '"]');
+        if (link) link.classList.toggle('done', all);
+      });
+    }
+    boxes.forEach(function (b, i) {
+      if (saved[i]) b.checked = true;
+      b.addEventListener('change', function () {
+        saved[i] = b.checked;
+        try { localStorage.setItem(PROGRESS_KEY, JSON.stringify(saved)); } catch (e) {}
+        update();
+      });
+    });
+    update();
+  })();
+</script>
+</body>
+</html>
